@@ -136,9 +136,10 @@ GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   float pt  = genJetIter->pt();
   float eta = genJetIter->eta();
 
-  jetpt_[itcount]  = pt;
-  jeteta_[itcount] = eta;
-
+  if (itcount < 4) {
+   jetpt_[itcount]  = pt;
+   jeteta_[itcount] = eta;
+  }
   if (pt > 30) njet_++;
 
   myTree_->Fill();
