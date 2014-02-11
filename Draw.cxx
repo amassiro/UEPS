@@ -94,11 +94,11 @@
  mg->Add(g_e0_CMS,"lp");
  mg->Add(g_e0_ATLAS,"lp");
  mg->Add(g_e0_NoUE,"lp");
+ mg->Draw("a");
  mg->GetXaxis()->SetTitle("jet p_{T} threshold [GeV]");
  mg->GetYaxis()->SetTitle("0 jet efficiency");
- mg->Draw("a");
  leg->Draw();
-
+ ce0->SetGrid();
 
 
  TGraphAsymmErrors* grErr =  new TGraphAsymmErrors(n, X, Y_One, X_Zero, X_Zero, Y_Delta_e0_overE_do, Y_Delta_e0_overE_up);
@@ -111,7 +111,7 @@
  grErr->GetYaxis()->SetTitle("Relative error on efficiency");
 
  grErr->Draw ("apl");
-
+ ce0relative->SetGrid();
 
 }
 
