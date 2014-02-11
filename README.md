@@ -51,3 +51,23 @@ to Run:
 
 
 
+====
+# GenJets analysis dumper
+
+See GenDumper folder and readme
+
+====
+# Draw
+
+do:
+
+    r00t Draw.cxx
+
+
+
+
+
+
+
+
+
