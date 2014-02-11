@@ -1,5 +1,5 @@
 {
-#include <algorithm>
+ #include <algorithm>
 
  TFile* fCMS   = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_CMS_dump_tree.root");
  TFile* fATLAS = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_ATLAS_dump_tree.root");
@@ -22,7 +22,7 @@
  Double_t Y_One[200];
  Double_t X_Zero[200];
 
- int n = 3;
+ int n = 30;
  float totCMS   = tCMS   -> GetEntries();
  float totATLAS = tATLAS -> GetEntries();
  float totNoUE  = tNoUE  -> GetEntries();
@@ -65,17 +65,28 @@
  g_e0_CMS->SetMarkerSize(1);
  g_e0_CMS->SetMarkerStyle(20);
  g_e0_CMS->SetMarkerColor(kRed);
+ g_e0_CMS->SetLineColor(kRed);
  g_e0_CMS->GetXaxis()->SetTitle("jet p_{T} threshold [GeV]");
+ g_e0_CMS->GetYaxis()->SetTitle("0 jet efficiency");
 
  g_e0_ATLAS->SetMarkerSize(1);
  g_e0_ATLAS->SetMarkerStyle(21);
  g_e0_ATLAS->SetMarkerColor(kBlue);
+ g_e0_ATLAS->SetLineColor(kBlue);
  g_e0_ATLAS->GetXaxis()->SetTitle("jet p_{T} threshold [GeV]");
 
  g_e0_NoUE->SetMarkerSize(1);
  g_e0_NoUE->SetMarkerStyle(22);
  g_e0_NoUE->SetMarkerColor(kGreen);
+ g_e0_NoUE->SetLineColor(kGreen);
  g_e0_NoUE->GetXaxis()->SetTitle("jet p_{T} threshold [GeV]");
+
+ TLegend* leg = new TLegend(0.5,0.7,0.9,0.9);
+//  leg->SetHeader("The Legend Title");
+ leg->AddEntry(g_e0_NoUE,"No UE","lp");
+ leg->AddEntry(g_e0_CMS,"CMS tune","lp");
+ leg->AddEntry(g_e0_ATLAS,"ATLAS tune","lp");
+ leg->SetFillColor(0);
 
  TCanvas* ce0 = new TCanvas ("ce0","ce0",800,600);
 
@@ -83,7 +94,10 @@
  mg->Add(g_e0_CMS,"lp");
  mg->Add(g_e0_ATLAS,"lp");
  mg->Add(g_e0_NoUE,"lp");
+ mg->GetXaxis()->SetTitle("jet p_{T} threshold [GeV]");
+ mg->GetYaxis()->SetTitle("0 jet efficiency");
  mg->Draw("a");
+ leg->Draw();
 
 
 
@@ -92,7 +106,9 @@
  grErr->SetMarkerSize(1);
  grErr->SetMarkerStyle(21);
  grErr->SetMarkerColor(kRed);
+ grErr->SetLineColor(kRed);
  grErr->GetXaxis()->SetTitle("jet p_{T} threshold [GeV]");
+ grErr->GetYaxis()->SetTitle("Relative error on efficiency");
 
  grErr->Draw ("apl");
 
