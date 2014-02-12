@@ -7,7 +7,7 @@ Underlying event and parton shower
 where:
 
     cmsneu
-    /home/amassiro/Generation/UEPS
+    /home/amassiro/Generation/UEPS/CMSSW_5_3_14_patch2/src/UEPS/
 
 
 Perform GEN step only with CMSSW.

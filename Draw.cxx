@@ -32,7 +32,7 @@
   std::cout << " n[" << i << "]:: threshold = " << threshold;
 // double threshold = 25+i;
   X[i] = threshold;
-  TString s1 = Form ("jetpt1>=%f",threshold);
+  TString s1 = Form ("jetpt1<%f",threshold);
 
   float temp;
 
@@ -81,7 +81,7 @@
  g_e0_NoUE->SetLineColor(kGreen);
  g_e0_NoUE->GetXaxis()->SetTitle("jet p_{T} threshold [GeV]");
 
- TLegend* leg = new TLegend(0.5,0.7,0.9,0.9);
+ TLegend* leg = new TLegend(0.1,0.7,0.5,0.9);
 //  leg->SetHeader("The Legend Title");
  leg->AddEntry(g_e0_NoUE,"No UE","lp");
  leg->AddEntry(g_e0_CMS,"CMS tune","lp");
@@ -112,6 +112,42 @@
 
  grErr->Draw ("apl");
  ce0relative->SetGrid();
+
+
+ //--------------------------
+ TH1F* h_e0_CMS   = new TH1F("CMS","",100,0,200);
+ TH1F* h_e0_ATLAS = new TH1F("ATLAS","",100,0,200);
+ TH1F* h_e0_NoUE  = new TH1F("NoUE","",100,0,200);
+
+//  TH1F* h_e0_CMS   = new TH1F("CMS","",n,10,10+n*2X);
+//  TH1F* h_e0_ATLAS = new TH1F("ATLAS","",n,10,10+n*2X);
+//  TH1F* h_e0_NoUE  = new TH1F("NoUE","",n,10,10+n*2X);
+
+ tCMS->Draw("jetpt1 >> CMS","","goff");
+ tATLAS->Draw("jetpt1 >> ATLAS","","goff");
+ tNoUE->Draw("jetpt1 >> NoUE","","goff");
+
+ h_e0_CMS->SetMarkerColor(kRed);
+ h_e0_CMS->SetLineWidth(2);
+ h_e0_CMS->SetLineColor(kRed);
+ h_e0_CMS->GetXaxis()->SetTitle("jet p_{T} [GeV]");
+ h_e0_CMS->GetYaxis()->SetTitle("evetns");
+
+ h_e0_ATLAS->SetMarkerColor(kBlue);
+ h_e0_ATLAS->SetLineColor(kBlue);
+ h_e0_ATLAS->SetLineWidth(2);
+ h_e0_ATLAS->GetXaxis()->SetTitle("events");
+
+ h_e0_NoUE->SetMarkerColor(kGreen);
+ h_e0_NoUE->SetLineColor(kGreen);
+ h_e0_NoUE->SetLineWidth(2);
+ h_e0_NoUE->GetXaxis()->SetTitle("events");
+
+ TCanvas* cn = new TCanvas ("cn","cn",800,600);
+ h_e0_CMS->DrawNormalized();
+ h_e0_ATLAS->DrawNormalized("same");
+ h_e0_NoUE->DrawNormalized("same");
+ cn->SetGrid();
 
 }
 
