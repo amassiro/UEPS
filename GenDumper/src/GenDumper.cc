@@ -129,6 +129,10 @@ GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
  iEvent.getByLabel(GenJetCollection_,genJet);
 
 //  njet_ = (*genJet).size();
+ for (int i=0; i<4; i++) {
+  jetpt_[i]  = 0;
+  jeteta_[i] = -99;
+ }
 
  njet_ = 0;
  int itcount = 0;
@@ -142,10 +146,9 @@ GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
   if (pt > 30) njet_++;
 
-  myTree_->Fill();
-
   itcount++;
  }
+ myTree_->Fill();
 }
 
 
