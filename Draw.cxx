@@ -19,10 +19,13 @@
  Double_t Y_Delta_e0_overE_up[200];
  Double_t Y_Delta_e0_overE_do[200];
 
+ Double_t Y_Delta_e0_overE_ATLAS_vs_CMS_up[200];
+ Double_t Y_Delta_e0_overE_ATLAS_vs_CMS_do[200];
+
  Double_t Y_One[200];
  Double_t X_Zero[200];
 
- int n = 30;
+ int n = 100;
  float totCMS   = tCMS   -> GetEntries();
  float totATLAS = tATLAS -> GetEntries();
  float totNoUE  = tNoUE  -> GetEntries();
@@ -50,6 +53,15 @@
   Y_Delta_e0_overE_up[i] = Y_Delta_e0_up[i] / Y_e0_CMS[i];
   Y_Delta_e0_overE_do[i] = Y_Delta_e0_do[i] / Y_e0_CMS[i];
 
+  if (delta[0]<0) {
+   Y_Delta_e0_overE_ATLAS_vs_CMS_up[i] = - delta[0] / Y_e0_CMS[i];
+   Y_Delta_e0_overE_ATLAS_vs_CMS_do[i] = 0;
+  }
+  else {
+   Y_Delta_e0_overE_ATLAS_vs_CMS_up[i] = 0;
+   Y_Delta_e0_overE_ATLAS_vs_CMS_do[i] = delta[0] / Y_e0_CMS[i];
+  }
+//   std::cout << " Y_Delta_e0_overE_ATLAS_vs_CMS_up[" << i << "] = " << Y_Delta_e0_overE_ATLAS_vs_CMS_up[i] << std::endl;
   Y_One[i]  = 1.;
   X_Zero[i] = 0.;
 
@@ -102,6 +114,7 @@
 
 
  TGraphAsymmErrors* grErr =  new TGraphAsymmErrors(n, X, Y_One, X_Zero, X_Zero, Y_Delta_e0_overE_do, Y_Delta_e0_overE_up);
+ TGraphAsymmErrors* grErr_ATLAS_vs_CMS =  new TGraphAsymmErrors(n, X, Y_One, X_Zero, X_Zero, Y_Delta_e0_overE_ATLAS_vs_CMS_do, Y_Delta_e0_overE_ATLAS_vs_CMS_up);
  TCanvas* ce0relative = new TCanvas ("ce0relative","ce0relative",800,600);
  grErr->SetMarkerSize(1);
  grErr->SetMarkerStyle(21);
@@ -111,7 +124,16 @@
  grErr->GetYaxis()->SetTitle("Relative error on efficiency");
 
  grErr->Draw ("apl");
+
+ grErr_ATLAS_vs_CMS->SetMarkerSize(0);
+ grErr_ATLAS_vs_CMS->SetMarkerStyle(21);
+ grErr_ATLAS_vs_CMS->SetMarkerColor(kBlue);
+ grErr_ATLAS_vs_CMS->SetLineColor(kBlue);
+ grErr_ATLAS_vs_CMS->SetLineStyle(2);
+ grErr_ATLAS_vs_CMS->SetLineWidth(2);
+ grErr_ATLAS_vs_CMS->Draw ("pl");
  ce0relative->SetGrid();
+
 
 
  //--------------------------
@@ -147,6 +169,7 @@
  h_e0_CMS->DrawNormalized();
  h_e0_ATLAS->DrawNormalized("same");
  h_e0_NoUE->DrawNormalized("same");
+ leg->Draw();
  cn->SetGrid();
 
 }
