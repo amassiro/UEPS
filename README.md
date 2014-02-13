@@ -22,6 +22,8 @@ Transform in edm format:
     cp /home/amassiro/Generation/MINLO/POWHEG-BOX/WW/testAM_1M_events/pwgevents-rwgt.lhe /tmp/amassiro/WW1Mevents.lhe
     cmsDriver.py MCDBtoEDM --conditions START53_V7C::All -s NONE --eventcontent RAWSIM --datatier GEN --filein file:/tmp/amassiro/WW1Mevents.lhe --fileout /tmp/amassiro/WW1Mevents.root -n -1
 
+    cmsDriver.py MCDBtoEDM --conditions START53_V7C::All -s NONE --eventcontent RAWSIM --datatier GEN --filein file:/tmp/amassiro/WW1Mevents_lvlv_emutau.lhe --fileout /tmp/amassiro/WW1Mevents_lvlv_emutau.root -n -1
+
 
 Prepare standard GEN:
 
@@ -40,6 +42,7 @@ To obtain:
     ATLAS_py_GEN.py
     NoUE_py_GEN.py
     CMS_py_GEN.py  -> just as a reference with nominal tune
+    CMS_Herwig_py_GEN.py
 
 
 to Run:
@@ -47,6 +50,7 @@ to Run:
     cmsRun ATLAS_py_GEN.py
     cmsRun CMS_py_GEN.py
     cmsRun NoUE_py_GEN.py
+    cmsRun CMS_Herwig_py_GEN.py
 
 
 
