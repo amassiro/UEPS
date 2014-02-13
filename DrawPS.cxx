@@ -25,7 +25,7 @@
  Double_t Y_One[200];
  Double_t X_Zero[200];
 
- int n = 100;
+ int n = 50;
  float totCMS   = tCMS   -> GetEntries();
  float totATLAS = tATLAS -> GetEntries();
  float totHerwig  = tHerwig  -> GetEntries();
@@ -95,7 +95,7 @@
 
  TLegend* leg = new TLegend(0.1,0.7,0.5,0.9);
 //  leg->SetHeader("The Legend Title");
- leg->AddEntry(g_e0_Herwig,"No UE","lp");
+ leg->AddEntry(g_e0_Herwig,"Herwig PS","lp");
  leg->AddEntry(g_e0_CMS,"CMS tune","lp");
  leg->AddEntry(g_e0_ATLAS,"ATLAS tune","lp");
  leg->SetFillColor(0);
@@ -137,9 +137,9 @@
 
 
  //--------------------------
- TH1F* h_e0_CMS   = new TH1F("CMS","",100,0,200);
- TH1F* h_e0_ATLAS = new TH1F("ATLAS","",100,0,200);
- TH1F* h_e0_Herwig  = new TH1F("Herwig","",100,0,200);
+ TH1F* h_e0_CMS   = new TH1F("CMS","",50,0,200);
+ TH1F* h_e0_ATLAS = new TH1F("ATLAS","",50,0,200);
+ TH1F* h_e0_Herwig  = new TH1F("Herwig","",50,0,200);
 
 //  TH1F* h_e0_CMS   = new TH1F("CMS","",n,10,10+n*2X);
 //  TH1F* h_e0_ATLAS = new TH1F("ATLAS","",n,10,10+n*2X);
