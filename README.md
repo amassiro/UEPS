@@ -67,6 +67,9 @@ do:
 
     r00t Draw.cxx
 
+compare Pythia and Herwig
+
+    r99t DrawPS.cxx
 
 
 
