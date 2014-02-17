@@ -17,6 +17,19 @@ Where:
     /home/amassiro/Generation/UEPS/CMSSW_5_3_14_patch2/src
 
 
+
+Decay WW with pythia (in case of Herwig later):
+
+    cd /afs/cern.ch/user/a/amassiro/work/Generation/HH/Pythia8/LH-HH-DECAY/
+    cd pythia8153/examples
+    ln -s ../../Makefile .
+    ln -s ../../main96.cc .
+    make main96
+    source config.sh
+    scp amassiro@cmsneu:/tmp/amassiro/WW1Mevents.lhe /tmp/amassiro/
+    ./main96.exe   /tmp/amassiro/WW1Mevents.lhe    /tmp/amassiro/WW1Mevents_lvlv_emutau.lhe
+
+
 Transform in edm format:
 
     cp /home/amassiro/Generation/MINLO/POWHEG-BOX/WW/testAM_1M_events/pwgevents-rwgt.lhe /tmp/amassiro/WW1Mevents.lhe
