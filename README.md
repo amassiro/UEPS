@@ -12,12 +12,6 @@ where:
 
 Perform GEN step only with CMSSW.
 
-Where:
-
-    /home/amassiro/Generation/UEPS/CMSSW_5_3_14_patch2/src
-
-
-
 Decay WW with pythia (in case of Herwig later):
 
     cd /afs/cern.ch/user/a/amassiro/work/Generation/HH/Pythia8/LH-HH-DECAY/
@@ -84,6 +78,11 @@ compare Pythia and Herwig
 
     r99t DrawPS.cxx
 
+
+Just draw:
+
+    r99t DrawDistribution.cxx\(\"jetpt1\",200,-200,200,\"jetpt1\ [GeV]\"\)
+    r99t DrawDistribution.cxx\(\"jeteta1\",100,-5,5,\"jeteta1\"\)
 
 
 
