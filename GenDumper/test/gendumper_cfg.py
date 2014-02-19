@@ -27,7 +27,8 @@ process.TFileService = cms.Service("TFileService",
 )
 
 process.Analyzer = cms.EDAnalyzer('GenDumper',
-     GenJetCollection = cms.InputTag("ak5GenJets")
+     GenJetCollection       = cms.InputTag("ak5GenJets"),
+     GenParticlesCollection = cms.InputTag("genParticles")
 )
 
 
