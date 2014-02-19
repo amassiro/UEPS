@@ -3,7 +3,8 @@
 
  TFile* fCMS   = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_CMS_dump_tree.root");
  TFile* fATLAS = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_ATLAS_dump_tree.root");
- TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree.root");
+ TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree_2.root");
+//  TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree.root");
 
  TTree* tCMS   =  (TTree*) fCMS   -> Get ("Analyzer/myTree");
  TTree* tATLAS =  (TTree*) fATLAS -> Get ("Analyzer/myTree");
@@ -96,8 +97,8 @@
  TLegend* leg = new TLegend(0.1,0.7,0.5,0.9);
 //  leg->SetHeader("The Legend Title");
  leg->AddEntry(g_e0_Herwig,"Herwig PS","lp");
- leg->AddEntry(g_e0_CMS,"CMS tune","lp");
- leg->AddEntry(g_e0_ATLAS,"ATLAS tune","lp");
+ leg->AddEntry(g_e0_CMS,"Pythia CMS tune","lp");
+ leg->AddEntry(g_e0_ATLAS,"Pythia ATLAS tune","lp");
  leg->SetFillColor(0);
 
  TCanvas* ce0 = new TCanvas ("ce0","ce0",800,600);

@@ -11,7 +11,8 @@ void DrawDistribution(std::string var = "jetpt1", int NBIN = 1000, int MIN = 0, 
 
  TFile* fCMS   = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_CMS_dump_tree.root");
  TFile* fATLAS = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_ATLAS_dump_tree.root");
- TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree.root");
+ TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree_2.root");
+//  TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree.root");
 
  TTree* tCMS   =  (TTree*) fCMS   -> Get ("Analyzer/myTree");
  TTree* tATLAS =  (TTree*) fATLAS -> Get ("Analyzer/myTree");
@@ -33,7 +34,7 @@ void DrawDistribution(std::string var = "jetpt1", int NBIN = 1000, int MIN = 0, 
  h_e0_CMS->SetMarkerColor(kRed);
  h_e0_CMS->SetLineWidth(2);
  h_e0_CMS->SetLineColor(kRed);
- h_e0_CMS->GetXaxis()->SetTitle(varHR.c_str();
+ h_e0_CMS->GetXaxis()->SetTitle(varHR.c_str());
  h_e0_CMS->GetYaxis()->SetTitle("evetns");
 
  h_e0_ATLAS->SetMarkerColor(kBlue);
@@ -45,6 +46,12 @@ void DrawDistribution(std::string var = "jetpt1", int NBIN = 1000, int MIN = 0, 
  h_e0_Herwig->SetLineColor(kGreen);
  h_e0_Herwig->SetLineWidth(2);
  h_e0_Herwig->GetXaxis()->SetTitle("events");
+
+ TLegend* leg = new TLegend(0.5,0.7,0.9,0.9);
+ leg->AddEntry(h_e0_Herwig,"Herwig PS","lp");
+ leg->AddEntry(h_e0_CMS,"Pythia CMS tune","lp");
+ leg->AddEntry(h_e0_ATLAS,"Pythia ATLAS tune","lp");
+ leg->SetFillColor(0);
 
  TCanvas* cn = new TCanvas ("cn","cn",800,600);
  h_e0_CMS->DrawNormalized();
