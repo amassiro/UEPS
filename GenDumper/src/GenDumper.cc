@@ -38,8 +38,18 @@
 #include "TTree.h"
 
 
+
+//---- for GenParticles
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+// #include "DataFormats/Candidate/interface/Candidate.h"
+
 //---- for GenJets
 #include "DataFormats/JetReco/interface/GenJet.h" 
+
+//---- for DeltaR
+#include "Math/VectorUtil.h"
+//---- for DeltaPhi
+#include "DataFormats/Math/interface/deltaPhi.h"
 
 
 //
@@ -63,10 +73,12 @@ class GenDumper : public edm::EDAnalyzer {
       virtual void endRun(edm::Run const&, edm::EventSetup const&);
       virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
       virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
+      bool ifJetALepton(float phi, float eta, edm::Handle<reco::GenParticleCollection> genParticles);
 
       // ----------member data ---------------------------
       // ----------member data ---------------------------
       edm::InputTag GenJetCollection_;
+      edm::InputTag GenParticlesCollection_;
 
       TTree* myTree_;
       int njet_;
@@ -90,7 +102,9 @@ GenDumper::GenDumper(const edm::ParameterSet& iConfig)
 
 {
    //now do what ever initialization is needed
- GenJetCollection_ = iConfig.getParameter<edm::InputTag>("GenJetCollection");
+ GenJetCollection_       = iConfig.getParameter<edm::InputTag>("GenJetCollection");
+ GenParticlesCollection_ = iConfig.getParameter<edm::InputTag>("GenParticlesCollection");
+
 
  edm::Service<TFileService> fs ;
  myTree_ = fs -> make <TTree>("myTree","myTree");
@@ -122,9 +136,11 @@ GenDumper::~GenDumper()
 //
 
 // ------------ method called for each event  ------------
-void
-GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
-{
+void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+
+ edm::Handle<reco::GenParticleCollection> genParticles;
+ iEvent.getByLabel(GenParticlesCollection_,genParticles);
+
  edm::Handle<reco::GenJetCollection> genJet;
  iEvent.getByLabel(GenJetCollection_,genJet);
 
@@ -137,19 +153,45 @@ GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
  njet_ = 0;
  int itcount = 0;
  for (reco::GenJetCollection::const_iterator genJetIter=genJet->begin(); genJetIter!=genJet->end(); genJetIter++){
+  float phi = genJetIter->phi();
   float pt  = genJetIter->pt();
   float eta = genJetIter->eta();
 
-  if (itcount < 4) {
-   jetpt_[itcount]  = pt;
-   jeteta_[itcount] = eta;
-  }
-  if (pt > 30) njet_++;
+  bool isLepton = ifJetALepton(phi,eta,genParticles);
 
+  if (isLepton == false) {
+
+   if (itcount < 4) {
+    jetpt_[itcount]  = pt;
+    jeteta_[itcount] = eta;
+   }
+   if (pt > 30) njet_++;
+  }
   itcount++;
  }
+
  myTree_->Fill();
 }
+
+
+bool GenDumper::ifJetALepton(float phi, float eta, edm::Handle<reco::GenParticleCollection> genParticles) {
+ bool isIt = false;
+ for (reco::GenParticleCollection::const_iterator genPart = genParticles->begin(); genPart != genParticles->end(); genPart++){
+  int id = abs(genPart->pdgId());
+  if (id == 11 || id == 13 || id == 15) { //---- e/mu/tau
+
+   float phig = genPart->phi();
+   float etag = genPart->eta();
+
+   float deltaR = sqrt(reco::deltaPhi(phig,phi)*reco::deltaPhi(phig,phi) + (etag-eta)*(etag-eta));
+   if (deltaR < 0.001) {
+    isIt = true;
+   }
+  }
+ }
+ return isIt;
+}
+
 
 
 // ------------ method called once each job just before starting event loop  ------------
