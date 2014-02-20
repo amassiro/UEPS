@@ -49,7 +49,7 @@ To obtain:
     ATLAS_py_GEN.py
     NoUE_py_GEN.py
     CMS_py_GEN.py  -> just as a reference with nominal tune
-    CMS_Herwig_py_GEN.py
+    CMS_Herwig_py_GEN.py  -> IPROC is hardcoded to work for WW!
 
 
 to Run:
