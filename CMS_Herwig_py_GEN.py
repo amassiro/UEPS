@@ -50,7 +50,8 @@ process.RAWSIMoutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
     outputCommands = process.RAWSIMEventContent.outputCommands,
-    fileName = cms.untracked.string('/tmp/amassiro/WW1Mevents_TUNE_CMS_Herwig_2.root'),
+    #fileName = cms.untracked.string('/tmp/amassiro/WW1Mevents_TUNE_CMS_Herwig_2.root'),
+    fileName = cms.untracked.string('/tmp/amassiro/WW1Mevents_TUNE_CMS_Herwig.root'),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('GEN-SIM')
@@ -74,6 +75,7 @@ process.generator = cms.EDFilter("Herwig6HadronizerFilter",
             'RMASS(5) = 4.8 ! Set b mass.',
             'RMASS(6) = 172.5 ! Set top mass.',
             'SOFTME = 0 ! Do not use soft matrix-element corrections.',
+            'IPROC = -18000 ! proc should be -ve',
         ),
         herwigAUET2settings = cms.vstring(
             #'MODPDF(1) = 10042 ! PDF set according to LHAGLUE',
