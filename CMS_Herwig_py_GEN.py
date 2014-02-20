@@ -75,7 +75,7 @@ process.generator = cms.EDFilter("Herwig6HadronizerFilter",
             'RMASS(5) = 4.8 ! Set b mass.',
             'RMASS(6) = 172.5 ! Set top mass.',
             'SOFTME = 0 ! Do not use soft matrix-element corrections.',
-            'IPROC = -18000 ! proc should be -ve',
+            'IPROC = -2850 ! proc should be -ve',
         ),
         herwigAUET2settings = cms.vstring(
             #'MODPDF(1) = 10042 ! PDF set according to LHAGLUE',
