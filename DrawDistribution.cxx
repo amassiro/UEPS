@@ -12,7 +12,8 @@ void DrawDistribution(std::string var = "jetpt1", int NBIN = 1000, int MIN = 0, 
  TFile* fCMS   = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_CMS_dump_tree.root");
  TFile* fATLAS = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_ATLAS_dump_tree.root");
 //  TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree_2.root");
- TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree.root");
+//  TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree.root");
+ TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_UE_dump_tree.root");
 
  TTree* tCMS   =  (TTree*) fCMS   -> Get ("Analyzer/myTree");
  TTree* tATLAS =  (TTree*) fATLAS -> Get ("Analyzer/myTree");

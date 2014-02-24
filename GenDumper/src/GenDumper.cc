@@ -51,6 +51,8 @@
 //---- for DeltaPhi
 #include "DataFormats/Math/interface/deltaPhi.h"
 
+//---- for LHE information
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 
 //
 // class declaration
@@ -79,11 +81,14 @@ class GenDumper : public edm::EDAnalyzer {
       // ----------member data ---------------------------
       edm::InputTag GenJetCollection_;
       edm::InputTag GenParticlesCollection_;
+      edm::InputTag mcLHEEventInfoTag_;
 
       TTree* myTree_;
       int njet_;
       float jetpt_[10];
       float jeteta_[10];
+      float lhejetpt_[10];
+      float lhejeteta_[10];
 
 };
 
@@ -101,10 +106,10 @@ class GenDumper : public edm::EDAnalyzer {
 GenDumper::GenDumper(const edm::ParameterSet& iConfig)
 
 {
-   //now do what ever initialization is needed
+ //now do what ever initialization is needed
  GenJetCollection_       = iConfig.getParameter<edm::InputTag>("GenJetCollection");
  GenParticlesCollection_ = iConfig.getParameter<edm::InputTag>("GenParticlesCollection");
-
+ mcLHEEventInfoTag_      = iConfig.getParameter<edm::InputTag>("mcLHEEventInfoTag");
 
  edm::Service<TFileService> fs ;
  myTree_ = fs -> make <TTree>("myTree","myTree");
@@ -119,12 +124,20 @@ GenDumper::GenDumper(const edm::ParameterSet& iConfig)
  myTree_ -> Branch("jeteta3", &jeteta_[2], "jeteta3/F");
  myTree_ -> Branch("jeteta4", &jeteta_[3], "jeteta4/F");
 
+ myTree_ -> Branch("lhejetpt1", &lhejetpt_[0], "lhejetpt1/F");
+ myTree_ -> Branch("lhejetpt2", &lhejetpt_[1], "lhejetpt2/F");
+ myTree_ -> Branch("lhejetpt3", &lhejetpt_[2], "lhejetpt3/F");
+ myTree_ -> Branch("lhejetpt4", &lhejetpt_[3], "lhejetpt4/F");
+ myTree_ -> Branch("lhejeteta1", &lhejeteta_[0], "lhejeteta1/F");
+ myTree_ -> Branch("lhejeteta2", &lhejeteta_[1], "lhejeteta2/F");
+ myTree_ -> Branch("lhejeteta3", &lhejeteta_[2], "lhejeteta3/F");
+ myTree_ -> Branch("lhejeteta4", &lhejeteta_[3], "lhejeteta4/F");
 }
 
 
 GenDumper::~GenDumper()
 {
- 
+
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
 
@@ -168,6 +181,34 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    if (pt > 30) njet_++;
   }
   itcount++;
+ }
+
+ //---- LHE information ----
+ edm::Handle<LHEEventProduct> productLHEHandle;
+ iEvent.getByLabel(mcLHEEventInfoTag_, productLHEHandle);
+
+ lhef::HEPEUP LHEhepeup = (*(productLHEHandle.product())).hepeup();
+
+ for (int i=0; i<4; i++) {
+  lhejetpt_[i]  = 0;
+  lhejeteta_[i] = -99;
+ }
+
+ itcount = 0;
+ // loop over particles in the event
+ for (unsigned int iPart = 0 ; iPart < LHEhepeup.IDUP.size (); ++iPart) {
+  if (LHEhepeup.ISTUP.at (iPart) != 1) continue ;
+  int type = abs (LHEhepeup.IDUP.at (iPart)) ;
+  if ((type < 9 && type > 0) || type == 21) {
+   float pt = (
+     sqrt (LHEhepeup.PUP.at (iPart) [0] * LHEhepeup.PUP.at (iPart) [0] + // px
+     LHEhepeup.PUP.at (iPart) [1] * LHEhepeup.PUP.at (iPart) [1]) // py
+                          );
+   if (itcount < 4) {
+    lhejetpt_[itcount]  = pt;
+   }
+   itcount++;
+  }
  }
 
  myTree_->Fill();
