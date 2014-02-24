@@ -3,6 +3,9 @@
 # Revision: 1.381.2.28 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/PyReleaseValidation/python/ConfigBuilder.py,v 
 # with command line options: BLA.py --step GEN --beamspot Realistic8TeVCollision --pileup NoPileUp --datamix NODATAMIXER --eventcontent RAWSIM --datatier GEN-SIM --conditions auto:mc --filein file:/tmp/amassiro/WW1Mevents.root --fileout /tmp/amassiro/WW1Mevents_TUNE.root --no_exec
+
+# test from https://github.com/cms-sw/genproductions/blob/master/python/EightTeV/TT_8TeV_powheg_herwig_cff.py
+
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('GEN')
