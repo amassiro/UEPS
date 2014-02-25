@@ -8,6 +8,12 @@ Input
     /tmp/amassiro/WW1Mevents_TUNE_ATLAS.root
     /tmp/amassiro/WW1Mevents_TUNE_NOUE.root
     /tmp/amassiro/WW1Mevents_TUNE_CMS_Herwig.root
+    /tmp/amassiro/WW1Mevents_TUNE_CMS_Herwig_UE_bigSample.root
+
+
+Now stored on eos (space problems: ~ 70 GB each)
+
+    /eos/cms/store/user/amassiro/WW/GEN/
 
 
 do:
@@ -18,7 +24,8 @@ do:
     cmsRun gendumper_cfg.py   inputFiles=file:/tmp/amassiro/WW1Mevents_TUNE_CMS_Herwig.root outputFile=/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree.root
     cmsRun gendumper_cfg.py   inputFiles=file:/tmp/amassiro/WW1Mevents_TUNE_CMS_Herwig_2.root outputFile=/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree_2.root
 
-    cmsRun gendumper_cfg.py   inputFiles=file:/tmp/amassiro/WW1Mevents_TUNE_CMS_Herwig_UE.root outputFile=/tmp/amassiro/WW1Mevents_TUNE_Herwig_UE_dump_tree.root
+    cmsRun gendumper_cfg.py   inputFiles=file:/tmp/amassiro/WW1Mevents_TUNE_CMS_Herwig_UE.root             outputFile=/tmp/amassiro/WW1Mevents_TUNE_Herwig_UE_dump_tree.root
+    cmsRun gendumper_cfg.py   inputFiles=file:/tmp/amassiro/WW1Mevents_TUNE_CMS_Herwig_UE_bigSample.root   outputFile=/tmp/amassiro/WW1Mevents_TUNE_Herwig_UE_dump_tree.root
 
 
 
