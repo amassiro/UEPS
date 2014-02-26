@@ -57,6 +57,7 @@ to Run:
     cmsRun ATLAS_py_GEN.py
     cmsRun CMS_py_GEN.py
     cmsRun NoUE_py_GEN.py
+    cmsRun CMS_Herwig_AUET2_py_GEN.py
     cmsRun CMS_Herwig_py_GEN.py
 
 
@@ -81,9 +82,15 @@ compare Pythia and Herwig
 
 Just draw:
 
+    @LHE level
+    r99t DrawDistribution.cxx\(\"lhejetpt1\",200,0,200,\"lhejetpt1\ [GeV]\"\)
+    r99t DrawDistribution.cxx\(\"lhejetpt1\",2000,0,200,\"lhejetpt1\ [GeV]\"\)
+
+    @GEN level
     r99t DrawDistribution.cxx\(\"jetpt1\",200,-200,200,\"jetpt1\ [GeV]\"\)
     r99t DrawDistribution.cxx\(\"jeteta1\",100,-5,5,\"jeteta1\"\)
 
+    r99t DrawDistribution.cxx\(\"jetpt1/lhejetpt1\",200,-2,20,\"gen/parton\ jetpt\"\)
     r99t DrawDistribution.cxx\(\"jetpt1\",200,0,200,\"jetpt1\ [GeV]\"\)
     r99t DrawDistribution.cxx\(\"jeteta1\",100,-5,5,\"jeteta1\"\)
     r99t DrawDistribution.cxx\(\"jetpt2\",200,0,200,\"jetpt2\ [GeV]\"\)

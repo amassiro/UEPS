@@ -27,6 +27,10 @@ do:
     cmsRun gendumper_cfg.py   inputFiles=file:/tmp/amassiro/WW1Mevents_TUNE_CMS_Herwig_UE.root             outputFile=/tmp/amassiro/WW1Mevents_TUNE_Herwig_UE_dump_tree.root
     cmsRun gendumper_cfg.py   inputFiles=file:/tmp/amassiro/WW1Mevents_TUNE_CMS_Herwig_UE_bigSample.root   outputFile=/tmp/amassiro/WW1Mevents_TUNE_Herwig_UE_dump_tree.root
 
+    cmsRun gendumper_cfg.py   inputFiles=file:/tmp/amassiro/WW1Mevents_TUNE_CMS_Herwig_UE.root             outputFile=/tmp/amassiro/WW1Mevents_TUNE_Herwig_UE_dump_tree_TEST.root
+
+    cmsRun gendumper_cfg.py   inputFiles=file:/tmp/amassiro/WW1Mevents_TUNE_CMS.root             outputFile=/tmp/amassiro/WW1Mevents_TUNE_CMS_dump_tree_TEST.root
+
 
 
 

@@ -197,20 +197,28 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
  itcount = 0;
  // loop over particles in the event
  for (unsigned int iPart = 0 ; iPart < LHEhepeup.IDUP.size (); ++iPart) {
-  if (LHEhepeup.ISTUP.at (iPart) != 1) continue ;
-  int type = abs (LHEhepeup.IDUP.at (iPart)) ;
-  if ((type < 9 && type > 0) || type == 21) {
-   float pt = (
-     sqrt (LHEhepeup.PUP.at (iPart) [0] * LHEhepeup.PUP.at (iPart) [0] + // px
-     LHEhepeup.PUP.at (iPart) [1] * LHEhepeup.PUP.at (iPart) [1]) // py
-                          );
-   if (itcount < 4) {
-    lhejetpt_[itcount]  = pt;
+  // outgoing particles
+  if (LHEhepeup.ISTUP.at (iPart) == 1) {
+   int type = abs (LHEhepeup.IDUP.at (iPart)) ;
+//     if (type < 7) {
+   //-----      quarks       or     gluons
+   if ((type < 9 && type > 0) || type == 21) {
+    float pt = (
+               sqrt (
+                    LHEhepeup.PUP.at (iPart) [0] * LHEhepeup.PUP.at (iPart) [0] + // px
+                    LHEhepeup.PUP.at (iPart) [1] * LHEhepeup.PUP.at (iPart) [1]  // py
+                    )
+              );
+    if (itcount < 4) {
+     lhejetpt_[itcount]  = pt;
+    }
+//     std::cout << "     itcount = " << itcount << " pt = " << pt << std::endl;
+    itcount++;
    }
-   itcount++;
   }
  }
 
+//  if (itcount == 0) std::cout << " itcount = " << itcount << std::endl;
  myTree_->Fill();
 }
 
