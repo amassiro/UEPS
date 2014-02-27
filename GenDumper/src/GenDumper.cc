@@ -87,8 +87,10 @@ class GenDumper : public edm::EDAnalyzer {
       int njet_;
       float jetpt_[10];
       float jeteta_[10];
+      float jetphi_[10];
       float lhejetpt_[10];
       float lhejeteta_[10];
+      float lhejetphi_[10];
 
 };
 
@@ -123,6 +125,10 @@ GenDumper::GenDumper(const edm::ParameterSet& iConfig)
  myTree_ -> Branch("jeteta2", &jeteta_[1], "jeteta2/F");
  myTree_ -> Branch("jeteta3", &jeteta_[2], "jeteta3/F");
  myTree_ -> Branch("jeteta4", &jeteta_[3], "jeteta4/F");
+ myTree_ -> Branch("jetphi1", &jetphi_[0], "jetphi1/F");
+ myTree_ -> Branch("jetphi2", &jetphi_[1], "jetphi2/F");
+ myTree_ -> Branch("jetphi3", &jetphi_[2], "jetphi3/F");
+ myTree_ -> Branch("jetphi4", &jetphi_[3], "jetphi4/F");
 
  myTree_ -> Branch("lhejetpt1", &lhejetpt_[0], "lhejetpt1/F");
  myTree_ -> Branch("lhejetpt2", &lhejetpt_[1], "lhejetpt2/F");
@@ -132,6 +138,10 @@ GenDumper::GenDumper(const edm::ParameterSet& iConfig)
  myTree_ -> Branch("lhejeteta2", &lhejeteta_[1], "lhejeteta2/F");
  myTree_ -> Branch("lhejeteta3", &lhejeteta_[2], "lhejeteta3/F");
  myTree_ -> Branch("lhejeteta4", &lhejeteta_[3], "lhejeteta4/F");
+ myTree_ -> Branch("lhejetphi1", &lhejetphi_[0], "lhejetphi1/F");
+ myTree_ -> Branch("lhejetphi2", &lhejetphi_[1], "lhejetphi2/F");
+ myTree_ -> Branch("lhejetphi3", &lhejetphi_[2], "lhejetphi3/F");
+ myTree_ -> Branch("lhejetphi4", &lhejetphi_[3], "lhejetphi4/F");
 }
 
 
@@ -161,6 +171,7 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
  for (int i=0; i<4; i++) {
   jetpt_[i]  = 0;
   jeteta_[i] = -99;
+  jetphi_[i] = -99;
  }
 
  njet_ = 0;
@@ -177,6 +188,7 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    if (itcount < 4) {
     jetpt_[itcount]  = pt;
     jeteta_[itcount] = eta;
+    jetphi_[itcount] = phi;
    }
    if (pt > 30) njet_++;
   }
@@ -192,6 +204,7 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
  for (int i=0; i<4; i++) {
   lhejetpt_[i]  = 0;
   lhejeteta_[i] = -99;
+  lhejetphi_[i] = -99;
  }
 
  itcount = 0;
@@ -223,6 +236,8 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 }
 
 
+
+
 bool GenDumper::ifJetALepton(float phi, float eta, edm::Handle<reco::GenParticleCollection> genParticles) {
  bool isIt = false;
  for (reco::GenParticleCollection::const_iterator genPart = genParticles->begin(); genPart != genParticles->end(); genPart++){
@@ -233,7 +248,7 @@ bool GenDumper::ifJetALepton(float phi, float eta, edm::Handle<reco::GenParticle
    float etag = genPart->eta();
 
    float deltaR = sqrt(reco::deltaPhi(phig,phi)*reco::deltaPhi(phig,phi) + (etag-eta)*(etag-eta));
-   if (deltaR < 0.001) {
+   if (deltaR < 0.1) {
     isIt = true;
    }
   }
