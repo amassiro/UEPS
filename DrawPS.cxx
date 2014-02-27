@@ -40,9 +40,9 @@
 
   float temp;
 
-  temp = tCMS   -> GetEntries(s1.Data()); Y_e0_CMS[i]   = temp  / totCMS;
-  temp = tATLAS -> GetEntries(s1.Data()); Y_e0_ATLAS[i] = temp  / totATLAS;
-  temp = tHerwig  -> GetEntries(s1.Data()); Y_e0_Herwig[i]  = temp  / totHerwig;
+  temp = tCMS   -> GetEntries(s1.Data());    Y_e0_CMS[i]     = temp  / totCMS;
+  temp = tATLAS -> GetEntries(s1.Data());    Y_e0_ATLAS[i]   = temp  / totATLAS;
+  temp = tHerwig  -> GetEntries(s1.Data());  Y_e0_Herwig[i]  = temp  / totHerwig;
 
   float delta[2];
   delta[0] = Y_e0_CMS[i] - Y_e0_ATLAS[i];

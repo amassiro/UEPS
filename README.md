@@ -92,6 +92,7 @@ Just draw:
 
     r99t DrawDistribution.cxx\(\"jetpt1/lhejetpt1\",200,-2,20,\"gen/parton\ jetpt\"\)
     r99t DrawDistribution.cxx\(\"jetpt1\",200,0,200,\"jetpt1\ [GeV]\"\)
+    r99t DrawDistribution.cxx\(\"jetpt1\",400,0,1000,\"jetpt1\ [GeV]\"\)
     r99t DrawDistribution.cxx\(\"jeteta1\",100,-5,5,\"jeteta1\"\)
     r99t DrawDistribution.cxx\(\"jetpt2\",200,0,200,\"jetpt2\ [GeV]\"\)
 
