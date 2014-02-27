@@ -24,6 +24,9 @@
  Double_t Y_Delta_e0_overE_ATLAS_vs_CMS_up[200];
  Double_t Y_Delta_e0_overE_ATLAS_vs_CMS_do[200];
 
+ Double_t Y_Delta_e0_overE_Pythia_vs_Herwig_up[200];
+ Double_t Y_Delta_e0_overE_Pythia_vs_Herwig_do[200];
+
  Double_t Y_One[200];
  Double_t X_Zero[200];
 
@@ -57,15 +60,25 @@
   Y_Delta_e0_overE_up[i] = Y_Delta_e0_up[i] / Y_e0_CMS[i];
   Y_Delta_e0_overE_do[i] = Y_Delta_e0_do[i] / Y_e0_CMS[i];
 
-  if (delta[0]<0) {
-   Y_Delta_e0_overE_ATLAS_vs_CMS_up[i] = - delta[0] / Y_e0_CMS[i];
+  if (delta[0]>0) {
+   Y_Delta_e0_overE_ATLAS_vs_CMS_up[i] = delta[0] / Y_e0_CMS[i];
    Y_Delta_e0_overE_ATLAS_vs_CMS_do[i] = 0;
   }
   else {
    Y_Delta_e0_overE_ATLAS_vs_CMS_up[i] = 0;
-   Y_Delta_e0_overE_ATLAS_vs_CMS_do[i] = delta[0] / Y_e0_CMS[i];
+   Y_Delta_e0_overE_ATLAS_vs_CMS_do[i] = -delta[0] / Y_e0_CMS[i];
   }
-//   std::cout << " Y_Delta_e0_overE_ATLAS_vs_CMS_up[" << i << "] = " << Y_Delta_e0_overE_ATLAS_vs_CMS_up[i] << std::endl;
+
+  if (delta[1]>0) {
+   Y_Delta_e0_overE_Pythia_vs_Herwig_up[i] = delta[1] / Y_e0_CMS[i];
+   Y_Delta_e0_overE_Pythia_vs_Herwig_do[i] = 0;
+  }
+  else {
+   Y_Delta_e0_overE_Pythia_vs_Herwig_up[i] = 0;
+   Y_Delta_e0_overE_Pythia_vs_Herwig_do[i] = -delta[1] / Y_e0_CMS[i];
+  }
+
+ //   std::cout << " Y_Delta_e0_overE_ATLAS_vs_CMS_up[" << i << "] = " << Y_Delta_e0_overE_ATLAS_vs_CMS_up[i] << std::endl;
   Y_One[i]  = 1.;
   X_Zero[i] = 0.;
 
@@ -119,11 +132,12 @@
 
  TGraphAsymmErrors* grErr =  new TGraphAsymmErrors(n, X, Y_One, X_Zero, X_Zero, Y_Delta_e0_overE_do, Y_Delta_e0_overE_up);
  TGraphAsymmErrors* grErr_ATLAS_vs_CMS =  new TGraphAsymmErrors(n, X, Y_One, X_Zero, X_Zero, Y_Delta_e0_overE_ATLAS_vs_CMS_do, Y_Delta_e0_overE_ATLAS_vs_CMS_up);
+ TGraphAsymmErrors* grErr_Pythia_vs_Herwig =  new TGraphAsymmErrors(n, X, Y_One, X_Zero, X_Zero, Y_Delta_e0_overE_Pythia_vs_Herwig_do, Y_Delta_e0_overE_Pythia_vs_Herwig_up);
  TCanvas* ce0relative = new TCanvas ("ce0relative","ce0relative",800,600);
  grErr->SetMarkerSize(1);
  grErr->SetMarkerStyle(21);
- grErr->SetMarkerColor(kRed);
- grErr->SetLineColor(kRed);
+ grErr->SetMarkerColor(kBlack);
+ grErr->SetLineColor(kBlack);
  grErr->GetXaxis()->SetTitle("jet p_{T} threshold [GeV]");
  grErr->GetYaxis()->SetTitle("Relative error on efficiency");
 
@@ -136,8 +150,15 @@
  grErr_ATLAS_vs_CMS->SetLineStyle(2);
  grErr_ATLAS_vs_CMS->SetLineWidth(2);
  grErr_ATLAS_vs_CMS->Draw ("pl");
- ce0relative->SetGrid();
 
+ grErr_Pythia_vs_Herwig->SetMarkerSize(0);
+ grErr_Pythia_vs_Herwig->SetMarkerStyle(21);
+ grErr_Pythia_vs_Herwig->SetMarkerColor(kRed);
+ grErr_Pythia_vs_Herwig->SetLineColor(kRed);
+ grErr_Pythia_vs_Herwig->SetLineStyle(3);
+ grErr_Pythia_vs_Herwig->SetLineWidth(2);
+ grErr_Pythia_vs_Herwig->Draw ("pl");
+ ce0relative->SetGrid();
 
 
  //--------------------------
