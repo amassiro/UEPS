@@ -26,13 +26,15 @@
  Double_t Y_One[200];
  Double_t X_Zero[200];
 
- int n = 50;
+//  int n = 50;
+ int n = 70;
  float totCMS   = tCMS   -> GetEntries();
  float totATLAS = tATLAS -> GetEntries();
  float totHerwig  = tHerwig  -> GetEntries();
 
  for (int i=0; i<n; i++) {
-  double threshold = 10+i*2;
+  double threshold =  0+i*2;
+//   double threshold = 10+i*2;
   std::cout << " n[" << i << "]:: threshold = " << threshold;
 // double threshold = 25+i;
   X[i] = threshold;
