@@ -50,6 +50,7 @@ To obtain:
     NoUE_py_GEN.py
     CMS_py_GEN.py  -> just as a reference with nominal tune
     CMS_Herwig_py_GEN.py  -> IPROC is hardcoded to work for WW!
+    CMS_Z2Lep_py_GEN.py   -> newest tune!
 
 
 to Run:
@@ -59,6 +60,7 @@ to Run:
     cmsRun NoUE_py_GEN.py
     cmsRun CMS_Herwig_AUET2_py_GEN.py
     cmsRun CMS_Herwig_py_GEN.py
+    cmsRun CMS_Z2Lep_py_GEN.py
 
 
 

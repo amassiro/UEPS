@@ -21,6 +21,7 @@ do:
     cmsRun gendumper_cfg.py   inputFiles=file:/tmp/amassiro/WW1Mevents_TUNE_CMS.root             outputFile=/tmp/amassiro/WW1Mevents_TUNE_CMS_dump_tree.root
     cmsRun gendumper_cfg.py   inputFiles=file:/tmp/amassiro/WW1Mevents_TUNE_ATLAS.root           outputFile=/tmp/amassiro/WW1Mevents_TUNE_ATLAS_dump_tree.root
     cmsRun gendumper_cfg.py   inputFiles=file:/tmp/amassiro/WW1Mevents_TUNE_CMS_Herwig_UE.root   outputFile=/tmp/amassiro/WW1Mevents_TUNE_Herwig_UE_dump_tree.root
+    cmsRun gendumper_cfg.py   inputFiles=file:/tmp/amassiro/WW1Mevents_TUNE_CMS_Z2Lep.root       outputFile=/tmp/amassiro/WW1Mevents_TUNE_CMS_Z2Lep_dump_tree.root
 
 others for testing:
 
