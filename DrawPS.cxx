@@ -6,15 +6,18 @@
 //  TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree_2.root");
 //  TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree.root");
  TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_UE_dump_tree.root");
+ TFile* fCMS_Z2Lep = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_CMS_Z2Lep_dump_tree.root");
 
  TTree* tCMS   =  (TTree*) fCMS   -> Get ("Analyzer/myTree");
  TTree* tATLAS =  (TTree*) fATLAS -> Get ("Analyzer/myTree");
  TTree* tHerwig  =  (TTree*) fHerwig  -> Get ("Analyzer/myTree");
+ TTree* tCMS_Z2Lep   =  (TTree*) fCMS_Z2Lep -> Get ("Analyzer/myTree");
 
  Double_t X[200];
  Double_t Y_e0_CMS[200];
  Double_t Y_e0_ATLAS[200];
  Double_t Y_e0_Herwig[200];
+ Double_t Y_e0_CMS_Z2Lep[200];
  Double_t Y_Delta_e0_up[200];
  Double_t Y_Delta_e0_do[200];
 
@@ -35,7 +38,9 @@
  float totCMS   = tCMS   -> GetEntries();
  float totATLAS = tATLAS -> GetEntries();
  float totHerwig  = tHerwig  -> GetEntries();
-
+ float totCMS_Z2Lep  = tCMS_Z2Lep  -> GetEntries();
+ 
+ 
  for (int i=0; i<n; i++) {
   double threshold =  0+i*2;
 //   double threshold = 10+i*2;
@@ -48,14 +53,16 @@
 
   temp = tCMS   -> GetEntries(s1.Data());    Y_e0_CMS[i]     = temp  / totCMS;
   temp = tATLAS -> GetEntries(s1.Data());    Y_e0_ATLAS[i]   = temp  / totATLAS;
-  temp = tHerwig  -> GetEntries(s1.Data());  Y_e0_Herwig[i]  = temp  / totHerwig;
+  temp = tHerwig     -> GetEntries(s1.Data());  Y_e0_Herwig[i]  = temp  / totHerwig;
+  temp = tCMS_Z2Lep  -> GetEntries(s1.Data());  Y_e0_CMS_Z2Lep[i]  = temp  / totCMS_Z2Lep;
 
-  float delta[2];
+  float delta[3];
   delta[0] = Y_e0_CMS[i] - Y_e0_ATLAS[i];
   delta[1] = Y_e0_CMS[i] - Y_e0_Herwig[i];
+  delta[2] = Y_e0_CMS[i] - Y_e0_CMS_Z2Lep[i];
 
-  Y_Delta_e0_do[i] =        *std::max_element(delta,delta+2);
-  Y_Delta_e0_up[i] = -1. * (*std::min_element(delta,delta+2));
+  Y_Delta_e0_do[i] =        *std::max_element(delta,delta+3);
+  Y_Delta_e0_up[i] = -1. * (*std::min_element(delta,delta+3));
 
   Y_Delta_e0_overE_up[i] = Y_Delta_e0_up[i] / Y_e0_CMS[i];
   Y_Delta_e0_overE_do[i] = Y_Delta_e0_do[i] / Y_e0_CMS[i];
@@ -90,6 +97,7 @@
  TGraph* g_e0_CMS   = new TGraph(n,X,Y_e0_CMS);
  TGraph* g_e0_ATLAS = new TGraph(n,X,Y_e0_ATLAS);
  TGraph* g_e0_Herwig  = new TGraph(n,X,Y_e0_Herwig);
+ TGraph* g_e0_CMS_Z2Lep  = new TGraph(n,X,Y_e0_CMS_Z2Lep);
 
  g_e0_CMS->SetMarkerSize(1);
  g_e0_CMS->SetMarkerStyle(20);
@@ -110,11 +118,18 @@
  g_e0_Herwig->SetLineColor(kGreen);
  g_e0_Herwig->GetXaxis()->SetTitle("jet p_{T} threshold [GeV]");
 
+ g_e0_CMS_Z2Lep->SetMarkerSize(1);
+ g_e0_CMS_Z2Lep->SetMarkerStyle(23);
+ g_e0_CMS_Z2Lep->SetMarkerColor(kTeal);
+ g_e0_CMS_Z2Lep->SetLineColor(kTeal);
+ g_e0_CMS_Z2Lep->GetXaxis()->SetTitle("jet p_{T} threshold [GeV]");
+
  TLegend* leg = new TLegend(0.1,0.7,0.5,0.9);
 //  leg->SetHeader("The Legend Title");
  leg->AddEntry(g_e0_Herwig,"Herwig PS","lp");
  leg->AddEntry(g_e0_CMS,"Pythia CMS tune","lp");
  leg->AddEntry(g_e0_ATLAS,"Pythia ATLAS tune","lp");
+ leg->AddEntry(g_e0_CMS_Z2Lep,"Pythia CMS Z2*Lep tune","lp");
  leg->SetFillColor(0);
 
  TCanvas* ce0 = new TCanvas ("ce0","ce0",800,600);
@@ -123,6 +138,7 @@
  mg->Add(g_e0_CMS,"lp");
  mg->Add(g_e0_ATLAS,"lp");
  mg->Add(g_e0_Herwig,"lp");
+ mg->Add(g_e0_CMS_Z2Lep,"lp");
  mg->Draw("a");
  mg->GetXaxis()->SetTitle("jet p_{T} threshold [GeV]");
  mg->GetYaxis()->SetTitle("0 jet efficiency");
