@@ -63,6 +63,10 @@ to Run:
     cmsRun CMS_Z2Lep_py_GEN.py
 
 
+Information:
+
+    look at tunes here
+    https://twiki.cern.ch/twiki/bin/viewauth/CMS/TuneSnippets
 
 
 ====
