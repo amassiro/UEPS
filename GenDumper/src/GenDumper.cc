@@ -228,8 +228,8 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     jetphi_[itcount] = phi;
    }
    if (pt > 30) njet_++;
+   itcount++;
   }
-  itcount++;
  }
 
  //---- gen leptons
