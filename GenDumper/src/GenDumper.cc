@@ -79,8 +79,8 @@ class GenDumper : public edm::EDAnalyzer {
       virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
       virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
       bool ifJetALepton(float phi, float eta, edm::Handle<reco::GenParticleCollection> genParticles);
+      bool ifJetALepton(float phi, float eta, lhef::HEPEUP LHEhepeup);
 
-      // ----------member data ---------------------------
       // ----------member data ---------------------------
       edm::InputTag GenJetCollection_;
       edm::InputTag GenParticlesCollection_;
@@ -186,6 +186,11 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
  edm::Handle<reco::GenJetCollection> genJet;
  iEvent.getByLabel(GenJetCollection_,genJet);
 
+ edm::Handle<LHEEventProduct> productLHEHandle;
+ iEvent.getByLabel(mcLHEEventInfoTag_, productLHEHandle);
+
+ lhef::HEPEUP LHEhepeup = (*(productLHEHandle.product())).hepeup();
+
 //  njet_ = (*genJet).size();
  for (int i=0; i<2; i++) {
   pt_[i]  = 0;
@@ -205,7 +210,8 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   float pt  = genJetIter->pt();
   float eta = genJetIter->eta();
 
-  bool isLepton = ifJetALepton(phi,eta,genParticles);
+//   bool isLepton = ifJetALepton(phi,eta,genParticles);
+  bool isLepton = ifJetALepton(phi,eta,LHEhepeup);
 
   if (isLepton == false) {
 
@@ -232,10 +238,6 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
  }
 
  //---- LHE information ----
- edm::Handle<LHEEventProduct> productLHEHandle;
- iEvent.getByLabel(mcLHEEventInfoTag_, productLHEHandle);
-
- lhef::HEPEUP LHEhepeup = (*(productLHEHandle.product())).hepeup();
 
  for (int i=0; i<2; i++) {
   lhept_[i]  = 0;
@@ -301,6 +303,37 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 }
 
 
+
+bool GenDumper::ifJetALepton(float phi, float eta, lhef::HEPEUP LHEhepeup) {
+ bool isIt = false;
+ for (unsigned int iPart = 0 ; iPart < LHEhepeup.IDUP.size (); ++iPart) {
+  // outgoing particles
+  if (LHEhepeup.ISTUP.at (iPart) == 1) {
+   int type = abs (LHEhepeup.IDUP.at (iPart)) ;
+   //-----      leptons
+   if (type == 11 || type == 13 || type == 15) {
+
+ for (reco::GenParticleCollection::const_iterator genPart = genParticles->begin(); genPart != genParticles->end(); genPart++){
+  int id = abs(genPart->pdgId());
+  if (id == 11 || id == 13 || id == 15) { //---- e/mu/tau
+   TLorentzVector dummy (
+     LHEhepeup.PUP.at (iPart) [0], // px
+     LHEhepeup.PUP.at (iPart) [1], // py
+     LHEhepeup.PUP.at (iPart) [2], // pz
+     LHEhepeup.PUP.at (iPart) [3] // E
+                        ) ;
+
+   float phig = dummy->Phi();
+   float etag = dummy->Eta();
+
+   float deltaR = sqrt(reco::deltaPhi(phig,phi)*reco::deltaPhi(phig,phi) + (etag-eta)*(etag-eta));
+   if (deltaR < 0.1) {
+    isIt = true;
+   }
+  }
+ }
+ return isIt;
+}
 
 
 bool GenDumper::ifJetALepton(float phi, float eta, edm::Handle<reco::GenParticleCollection> genParticles) {
