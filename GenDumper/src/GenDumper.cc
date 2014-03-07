@@ -334,7 +334,7 @@ bool GenDumper::isJetALepton(float phi, float eta, lhef::HEPEUP LHEhepeup) {
     float etag = dummy.Eta();
 
     float deltaR = sqrt(reco::deltaPhi(phig,phi)*reco::deltaPhi(phig,phi) + (etag-eta)*(etag-eta));
-    if (deltaR < 0.01) {
+    if (deltaR < 0.1) {
      isIt = true;
     }
    }
