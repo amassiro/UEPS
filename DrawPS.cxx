@@ -3,9 +3,8 @@
 
  TFile* fCMS   = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_CMS_dump_tree.root");
  TFile* fATLAS = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_ATLAS_dump_tree.root");
-//  TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree_2.root");
-//  TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree.root");
- TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_UE_dump_tree.root");
+ TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_dump_tree.root");
+//  TFile* fHerwig  = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_Herwig_UE_dump_tree.root");
  TFile* fCMS_Z2Lep = new TFile ("/tmp/amassiro/WW1Mevents_TUNE_CMS_Z2Lep_dump_tree.root");
 
  TTree* tCMS   =  (TTree*) fCMS   -> Get ("Analyzer/myTree");
