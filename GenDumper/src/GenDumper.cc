@@ -312,23 +312,20 @@ bool GenDumper::ifJetALepton(float phi, float eta, lhef::HEPEUP LHEhepeup) {
    int type = abs (LHEhepeup.IDUP.at (iPart)) ;
    //-----      leptons
    if (type == 11 || type == 13 || type == 15) {
+    TLorentzVector dummy (
+      LHEhepeup.PUP.at (iPart) [0], // px
+      LHEhepeup.PUP.at (iPart) [1], // py
+      LHEhepeup.PUP.at (iPart) [2], // pz
+      LHEhepeup.PUP.at (iPart) [3] // E
+                         ) ;
 
- for (reco::GenParticleCollection::const_iterator genPart = genParticles->begin(); genPart != genParticles->end(); genPart++){
-  int id = abs(genPart->pdgId());
-  if (id == 11 || id == 13 || id == 15) { //---- e/mu/tau
-   TLorentzVector dummy (
-     LHEhepeup.PUP.at (iPart) [0], // px
-     LHEhepeup.PUP.at (iPart) [1], // py
-     LHEhepeup.PUP.at (iPart) [2], // pz
-     LHEhepeup.PUP.at (iPart) [3] // E
-                        ) ;
+    float phig = dummy.Phi();
+    float etag = dummy.Eta();
 
-   float phig = dummy->Phi();
-   float etag = dummy->Eta();
-
-   float deltaR = sqrt(reco::deltaPhi(phig,phi)*reco::deltaPhi(phig,phi) + (etag-eta)*(etag-eta));
-   if (deltaR < 0.1) {
-    isIt = true;
+    float deltaR = sqrt(reco::deltaPhi(phig,phi)*reco::deltaPhi(phig,phi) + (etag-eta)*(etag-eta));
+    if (deltaR < 0.1) {
+     isIt = true;
+    }
    }
   }
  }
