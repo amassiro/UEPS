@@ -54,6 +54,9 @@
 //---- for LHE information
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 
+//---- TLorentzVector
+#include "TLorentzVector.h"
+
 //
 // class declaration
 //
@@ -84,6 +87,13 @@ class GenDumper : public edm::EDAnalyzer {
       edm::InputTag mcLHEEventInfoTag_;
 
       TTree* myTree_;
+      //---- lepton
+      float pt_[10];
+      float eta_[10];
+      float lhept_[10];
+      float lheeta_[10];
+
+      //---- jets
       int njet_;
       float jetpt_[10];
       float jeteta_[10];
@@ -115,6 +125,15 @@ GenDumper::GenDumper(const edm::ParameterSet& iConfig)
 
  edm::Service<TFileService> fs ;
  myTree_ = fs -> make <TTree>("myTree","myTree");
+
+ myTree_ -> Branch("pt1", &pt_[0], "pt1/F");
+ myTree_ -> Branch("pt2", &pt_[1], "pt2/F");
+ myTree_ -> Branch("eta1", &eta_[0], "eta1/F");
+ myTree_ -> Branch("eta2", &eta_[1], "eta2/F");
+ myTree_ -> Branch("lhept1", &lhept_[0], "lhept1/F");
+ myTree_ -> Branch("lhept2", &lhept_[1], "lhept2/F");
+ myTree_ -> Branch("lheeta1", &lheeta_[0], "lheeta1/F");
+ myTree_ -> Branch("lheeta2", &lheeta_[1], "lheeta2/F");
 
  myTree_ -> Branch("njet", &njet_, "njet/I");
  myTree_ -> Branch("jetpt1", &jetpt_[0], "jetpt1/F");
@@ -168,7 +187,12 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
  iEvent.getByLabel(GenJetCollection_,genJet);
 
 //  njet_ = (*genJet).size();
- for (int i=0; i<4; i++) {
+ for (int i=0; i<2; i++) {
+  pt_[i]  = 0;
+  eta_[i]  = 0;
+ }
+
+  for (int i=0; i<4; i++) {
   jetpt_[i]  = 0;
   jeteta_[i] = -99;
   jetphi_[i] = -99;
@@ -195,11 +219,28 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   itcount++;
  }
 
+ itcount = 0;
+ for (reco::GenParticleCollection::const_iterator genPart = genParticles->begin(); genPart != genParticles->end(); genPart++){
+  int id = abs(genPart->pdgId());
+  if (id == 11 || id == 13 || id == 15) { //---- e/mu/tau
+   if (itcount < 2) {
+    pt_[itcount]  = genPart->pt();
+    eta_[itcount] = genPart->eta();
+   }
+   itcount++;
+  }
+ }
+
  //---- LHE information ----
  edm::Handle<LHEEventProduct> productLHEHandle;
  iEvent.getByLabel(mcLHEEventInfoTag_, productLHEHandle);
 
  lhef::HEPEUP LHEhepeup = (*(productLHEHandle.product())).hepeup();
+
+ for (int i=0; i<2; i++) {
+  lhept_[i]  = 0;
+  lheeta_[i] = -99;
+ }
 
  for (int i=0; i<4; i++) {
   lhejetpt_[i]  = 0;
@@ -231,7 +272,31 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
  }
 
-//  if (itcount == 0) std::cout << " itcount = " << itcount << std::endl;
+
+ itcount = 0;
+ // loop over particles in the event
+ for (unsigned int iPart = 0 ; iPart < LHEhepeup.IDUP.size (); ++iPart) {
+  // outgoing particles
+  if (LHEhepeup.ISTUP.at (iPart) == 1) {
+   int type = abs (LHEhepeup.IDUP.at (iPart)) ;
+   //-----      leptons
+   if (type == 11 || type == 13 || type == 15) {
+    TLorentzVector dummy (
+        LHEhepeup.PUP.at (iPart) [0], // px
+        LHEhepeup.PUP.at (iPart) [1], // py
+        LHEhepeup.PUP.at (iPart) [2], // pz
+        LHEhepeup.PUP.at (iPart) [3] // E
+       ) ;
+
+    if (itcount < 2) {
+     lhept_[itcount]   = dummy.Pt();
+     lheeta_[itcount]  = dummy.Eta();
+    }
+    itcount++;
+   }
+  }
+ }
+
  myTree_->Fill();
 }
 
