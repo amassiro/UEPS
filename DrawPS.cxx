@@ -33,12 +33,13 @@
  Double_t Y_One[200];
  Double_t X_Zero[200];
 
+ TString additionalCut = Form ("lhept1>20 && lhept2>20 && abs(lheeta1)<2.5 && abs(lheeta2)<2.5");
 //  int n = 50;
  int n = 70;
- float totCMS   = tCMS   -> GetEntries();
- float totATLAS = tATLAS -> GetEntries();
- float totHerwig  = tHerwig  -> GetEntries();
- float totCMS_Z2Lep  = tCMS_Z2Lep  -> GetEntries();
+ float totCMS   = tCMS   -> GetEntries( additionalCut.Data() );
+ float totATLAS = tATLAS -> GetEntries( additionalCut.Data() );
+ float totHerwig  = tHerwig  -> GetEntries( additionalCut.Data() );
+ float totCMS_Z2Lep  = tCMS_Z2Lep  -> GetEntries( additionalCut.Data() );
  
  
  for (int i=0; i<n; i++) {
@@ -47,7 +48,7 @@
   std::cout << " n[" << i << "]:: threshold = " << threshold;
 // double threshold = 25+i;
   X[i] = threshold;
-  TString s1 = Form ("jetpt1<%f",threshold);
+  TString s1 = Form ("%s && jetpt1<%f", additionalCut.Data(), threshold);
 
   float temp;
 
