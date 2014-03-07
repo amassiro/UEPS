@@ -78,8 +78,8 @@ class GenDumper : public edm::EDAnalyzer {
       virtual void endRun(edm::Run const&, edm::EventSetup const&);
       virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
       virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
-      bool ifJetALepton(float phi, float eta, edm::Handle<reco::GenParticleCollection> genParticles);
-      bool ifJetALepton(float phi, float eta, lhef::HEPEUP LHEhepeup);
+      bool isJetALepton(float phi, float eta, edm::Handle<reco::GenParticleCollection> genParticles);
+      bool isJetALepton(float phi, float eta, lhef::HEPEUP LHEhepeup);
 
       // ----------member data ---------------------------
       edm::InputTag GenJetCollection_;
@@ -90,8 +90,10 @@ class GenDumper : public edm::EDAnalyzer {
       //---- lepton
       float pt_[10];
       float eta_[10];
+      float phi_[10];
       float lhept_[10];
       float lheeta_[10];
+      float lhephi_[10];
 
       //---- jets
       int njet_;
@@ -130,10 +132,14 @@ GenDumper::GenDumper(const edm::ParameterSet& iConfig)
  myTree_ -> Branch("pt2", &pt_[1], "pt2/F");
  myTree_ -> Branch("eta1", &eta_[0], "eta1/F");
  myTree_ -> Branch("eta2", &eta_[1], "eta2/F");
+ myTree_ -> Branch("phi1", &phi_[0], "phi1/F");
+ myTree_ -> Branch("phi2", &phi_[1], "phi2/F");
  myTree_ -> Branch("lhept1", &lhept_[0], "lhept1/F");
  myTree_ -> Branch("lhept2", &lhept_[1], "lhept2/F");
  myTree_ -> Branch("lheeta1", &lheeta_[0], "lheeta1/F");
  myTree_ -> Branch("lheeta2", &lheeta_[1], "lheeta2/F");
+ myTree_ -> Branch("lhephi1", &lhephi_[0], "lhephi1/F");
+ myTree_ -> Branch("lhephi2", &lhephi_[1], "lhephi2/F");
 
  myTree_ -> Branch("njet", &njet_, "njet/I");
  myTree_ -> Branch("jetpt1", &jetpt_[0], "jetpt1/F");
@@ -194,7 +200,8 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 //  njet_ = (*genJet).size();
  for (int i=0; i<2; i++) {
   pt_[i]  = 0;
-  eta_[i]  = 0;
+  eta_[i]  = -99;
+  phi_[i]  = -99;
  }
 
   for (int i=0; i<4; i++) {
@@ -210,8 +217,8 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   float pt  = genJetIter->pt();
   float eta = genJetIter->eta();
 
-//   bool isLepton = ifJetALepton(phi,eta,genParticles);
-  bool isLepton = ifJetALepton(phi,eta,LHEhepeup);
+//   bool isLepton = isJetALepton(phi,eta,genParticles);
+  bool isLepton = isJetALepton(phi,eta,LHEhepeup);
 
   if (isLepton == false) {
 
@@ -225,6 +232,7 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   itcount++;
  }
 
+ //---- gen leptons
  itcount = 0;
  for (reco::GenParticleCollection::const_iterator genPart = genParticles->begin(); genPart != genParticles->end(); genPart++){
   int id = abs(genPart->pdgId());
@@ -232,6 +240,7 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    if (itcount < 2) {
     pt_[itcount]  = genPart->pt();
     eta_[itcount] = genPart->eta();
+    phi_[itcount] = genPart->phi();
    }
    itcount++;
   }
@@ -242,6 +251,7 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
  for (int i=0; i<2; i++) {
   lhept_[i]  = 0;
   lheeta_[i] = -99;
+  lhephi_[i] = -99;
  }
 
  for (int i=0; i<4; i++) {
@@ -284,15 +294,16 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //-----      leptons
    if (type == 11 || type == 13 || type == 15) {
     TLorentzVector dummy (
-        LHEhepeup.PUP.at (iPart) [0], // px
-        LHEhepeup.PUP.at (iPart) [1], // py
-        LHEhepeup.PUP.at (iPart) [2], // pz
-        LHEhepeup.PUP.at (iPart) [3] // E
-       ) ;
+                         LHEhepeup.PUP.at (iPart) [0], // px
+                         LHEhepeup.PUP.at (iPart) [1], // py
+                         LHEhepeup.PUP.at (iPart) [2], // pz
+                         LHEhepeup.PUP.at (iPart) [3] // E
+                         ) ;
 
     if (itcount < 2) {
      lhept_[itcount]   = dummy.Pt();
      lheeta_[itcount]  = dummy.Eta();
+     lhephi_[itcount]  = dummy.Phi();
     }
     itcount++;
    }
@@ -304,7 +315,7 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 
-bool GenDumper::ifJetALepton(float phi, float eta, lhef::HEPEUP LHEhepeup) {
+bool GenDumper::isJetALepton(float phi, float eta, lhef::HEPEUP LHEhepeup) {
  bool isIt = false;
  for (unsigned int iPart = 0 ; iPart < LHEhepeup.IDUP.size (); ++iPart) {
   // outgoing particles
@@ -313,17 +324,17 @@ bool GenDumper::ifJetALepton(float phi, float eta, lhef::HEPEUP LHEhepeup) {
    //-----      leptons
    if (type == 11 || type == 13 || type == 15) {
     TLorentzVector dummy (
-      LHEhepeup.PUP.at (iPart) [0], // px
-      LHEhepeup.PUP.at (iPart) [1], // py
-      LHEhepeup.PUP.at (iPart) [2], // pz
-      LHEhepeup.PUP.at (iPart) [3] // E
+                         LHEhepeup.PUP.at (iPart) [0], // px
+                         LHEhepeup.PUP.at (iPart) [1], // py
+                         LHEhepeup.PUP.at (iPart) [2], // pz
+                         LHEhepeup.PUP.at (iPart) [3] // E
                          ) ;
 
     float phig = dummy.Phi();
     float etag = dummy.Eta();
 
     float deltaR = sqrt(reco::deltaPhi(phig,phi)*reco::deltaPhi(phig,phi) + (etag-eta)*(etag-eta));
-    if (deltaR < 0.1) {
+    if (deltaR < 0.01) {
      isIt = true;
     }
    }
@@ -333,7 +344,7 @@ bool GenDumper::ifJetALepton(float phi, float eta, lhef::HEPEUP LHEhepeup) {
 }
 
 
-bool GenDumper::ifJetALepton(float phi, float eta, edm::Handle<reco::GenParticleCollection> genParticles) {
+bool GenDumper::isJetALepton(float phi, float eta, edm::Handle<reco::GenParticleCollection> genParticles) {
  bool isIt = false;
  for (reco::GenParticleCollection::const_iterator genPart = genParticles->begin(); genPart != genParticles->end(); genPart++){
   int id = abs(genPart->pdgId());
