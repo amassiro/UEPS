@@ -35,12 +35,21 @@
  TString additionalCut = Form ("lhept1>20 && lhept2>20 && abs(lheeta1)<2.5 && abs(lheeta2)<2.5");
  int n = 50;
 //  int n = 70;
- float totCMS   = tCMS   -> GetEntries( additionalCut.Data() );
- float totATLAS = tATLAS -> GetEntries( additionalCut.Data() );
- float totHerwig  = tHerwig  -> GetEntries( additionalCut.Data() );
- float totCMS_Z2Lep  = tCMS_Z2Lep  -> GetEntries( additionalCut.Data() );
- 
- 
+
+ //---- uncertainty on fiducial xsection
+//  additionalCut = Form ("lhept1>20 && lhept2>20 && abs(lheeta1)<2.5 && abs(lheeta2)<2.5");
+//  float totCMS   = tCMS   -> GetEntries( additionalCut.Data() );
+//  float totATLAS = tATLAS -> GetEntries( additionalCut.Data() );
+//  float totHerwig  = tHerwig  -> GetEntries( additionalCut.Data() );
+//  float totCMS_Z2Lep  = tCMS_Z2Lep  -> GetEntries( additionalCut.Data() );
+//  additionalCut = Form ("lhept1>20 && lhept2>20 && abs(lheeta1)<2.5 && abs(lheeta2)<2.5 && OTHER CUTS");
+
+ //---- uncertainty on xsec measurement
+ float totCMS   = tCMS   -> GetEntries();
+ float totATLAS = tATLAS -> GetEntries();
+ float totHerwig  = tHerwig  -> GetEntries();
+ float totCMS_Z2Lep  = tCMS_Z2Lep  -> GetEntries();
+
  for (int i=0; i<n; i++) {
   double threshold =  20+i*2;
 //   double threshold = 10+i*2;
