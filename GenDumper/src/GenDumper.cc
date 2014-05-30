@@ -104,6 +104,15 @@ class GenDumper : public edm::EDAnalyzer {
       float lhejeteta_[10];
       float lhejetphi_[10];
 
+      //---- MC qcd scale
+      float w00_;
+      float w01_;
+      float w10_;
+      float w11_;
+      float w12_;
+      float w21_;
+      float w22_;
+
 };
 
 //
@@ -167,6 +176,15 @@ GenDumper::GenDumper(const edm::ParameterSet& iConfig)
  myTree_ -> Branch("lhejetphi2", &lhejetphi_[1], "lhejetphi2/F");
  myTree_ -> Branch("lhejetphi3", &lhejetphi_[2], "lhejetphi3/F");
  myTree_ -> Branch("lhejetphi4", &lhejetphi_[3], "lhejetphi4/F");
+
+ myTree_ -> Branch("w00", &w00_, "w00/F");
+ myTree_ -> Branch("w01", &w01_, "w01/F");
+ myTree_ -> Branch("w10", &w10_, "w10/F");
+ myTree_ -> Branch("w11", &w11_, "w11/F");
+ myTree_ -> Branch("w12", &w12_, "w12/F");
+ myTree_ -> Branch("w21", &w21_, "w21/F");
+ myTree_ -> Branch("w22", &w22_, "w22/F");
+
 }
 
 
@@ -309,6 +327,55 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    }
   }
  }
+
+
+
+ //---- QCD scale
+ std::vector<std::string> comments_LHE;
+ std::vector<float> comments_LHE_weight;
+ std::vector<float> comments_LHE_rfac;
+ std::vector<float> comments_LHE_ffac;
+//---- mu mu weight
+ std::map < std::pair<float, float>, float > weights;
+
+ std::vector<std::string>::const_iterator it_end = (*(productLHEHandle.product())).comments_end();
+ std::vector<std::string>::const_iterator it = (*(productLHEHandle.product())).comments_begin();
+ for(; it != it_end; it++) {
+  comments_LHE.push_back (*it);
+ }
+
+// std::cout << " comments_LHE_.size() = " << comments_LHE_.size() << std::endl;
+ for (unsigned int iComm = 0; iComm<comments_LHE.size(); iComm++) {
+// std::cout << " i=" << iComm << " :: " << comments_LHE_.size() << " ==> " << comments_LHE_.at(iComm) << std::endl;
+  /// #new weight,renfact,facfact,pdf1,pdf2 32.2346904790193 1.00000000000000 1.00000000000000 11000 11000 lha
+  std::stringstream line( comments_LHE.at(iComm) );
+  std::string dummy;
+  line >> dummy; // #new weight,renfact,facfact,pdf1,pdf2
+  float dummy_float;
+  line >> dummy_float; // 32.2346904790193
+  comments_LHE_weight.push_back(dummy_float);
+  float dummy_float_weight = dummy_float;
+// std::cout << dummy_float << std::endl;
+  line >> dummy_float; // 1.00000000000000
+  comments_LHE_rfac.push_back(dummy_float);
+  float dummy_float_mu1 = dummy_float;
+// std::cout << dummy_float << std::endl;
+  line >> dummy_float; // 1.00000000000000
+  comments_LHE_ffac.push_back(dummy_float);
+  float dummy_float_mu2 = dummy_float;
+// std::cout << dummy_float << std::endl;
+  std::pair <float, float> mumu(dummy_float_mu1,dummy_float_mu2);
+  weights[mumu] = dummy_float_weight;
+ }
+
+ w00_ = weights[std::pair<float, float>(0.5, 0.5)];
+ w10_ = weights[std::pair<float, float>(1.0, 0.5)];
+ w01_ = weights[std::pair<float, float>(0.5, 1.0)];
+ w12_ = weights[std::pair<float, float>(1.0, 2.0)];
+ w21_ = weights[std::pair<float, float>(2.0, 1.0)];
+ w22_ = weights[std::pair<float, float>(2.0, 2.0)];
+ w11_ = weights[std::pair<float, float>(1.0, 1.0)];
+
 
  myTree_->Fill();
 }
