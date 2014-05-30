@@ -344,13 +344,14 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   comments_LHE.push_back (*it);
  }
 
-// std::cout << " comments_LHE_.size() = " << comments_LHE_.size() << std::endl;
+//  std::cout << " comments_LHE.size() = " << comments_LHE.size() << std::endl;
  for (unsigned int iComm = 0; iComm<comments_LHE.size(); iComm++) {
-// std::cout << " i=" << iComm << " :: " << comments_LHE_.size() << " ==> " << comments_LHE_.at(iComm) << std::endl;
+//   std::cout << " i=" << iComm << " :: " << comments_LHE.size() << " ==> " << comments_LHE.at(iComm) << std::endl;
   /// #new weight,renfact,facfact,pdf1,pdf2 32.2346904790193 1.00000000000000 1.00000000000000 11000 11000 lha
   std::stringstream line( comments_LHE.at(iComm) );
   std::string dummy;
   line >> dummy; // #new weight,renfact,facfact,pdf1,pdf2
+  line >> dummy;
   float dummy_float;
   line >> dummy_float; // 32.2346904790193
   comments_LHE_weight.push_back(dummy_float);
@@ -366,6 +367,7 @@ void GenDumper::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 // std::cout << dummy_float << std::endl;
   std::pair <float, float> mumu(dummy_float_mu1,dummy_float_mu2);
   weights[mumu] = dummy_float_weight;
+//   std::cout << " mu:mu:weight = " << dummy_float_mu1 << ":" << dummy_float_mu2 << ":" << dummy_float_weight << std::endl;
  }
 
  w00_ = weights[std::pair<float, float>(0.5, 0.5)];
