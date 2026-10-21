@@ -165,7 +165,7 @@ def plotName(dataset):
   return name
 
 def drawPSWeights(dataset, histos, results, plotDir, logy):
-  colors = [632, 600, 418, 807, 616, 432, 920, 880]   # kRed, kBlue, kGreen+2, kOrange+7, kMagenta, kCyan, kGray, kViolet
+  colors = [ROOT.kGreen+3, ROOT.kRed+1, ROOT.kBlue+1, ROOT.kCyan-4, ROOT.kMagenta+1, ROOT.kOrange+7, ROOT.kGray+2, ROOT.kViolet+1]
   name = plotName(dataset)
 
   cc = ROOT.TCanvas ("cc_" + name, "", 800, 600)
