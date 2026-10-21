@@ -27,9 +27,15 @@ NB: the sum of genWeight is cross-checked with genEventSumw from the Runs tree.
 If PSSumw is available in the Runs tree, it is printed as a cross-check too (assumed normalized as LHEScaleSumw: to be checked).
 
 
-Where:
+where:
 
-    lxplus, with ROOT (python3) and dasgoclient, e.g. any recent CMSSW release (cmsenv), or:
+    lxplus
+    /afs/cern.ch/user/a/amassiro/work/UEPS/PSWeights/
+
+
+Setup:
+
+    ROOT (python3) and dasgoclient, e.g. any recent CMSSW release (cmsenv), or:
 
     source /cvmfs/sft.cern.ch/lcg/views/LCG_109a/x86_64-el9-gcc13-opt/setup.sh
     export PATH=/cvmfs/cms.cern.ch/common:$PATH
