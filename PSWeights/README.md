@@ -27,17 +27,23 @@ NB: the sum of genWeight is cross-checked with genEventSumw from the Runs tree.
 If PSSumw is available in the Runs tree, it is printed as a cross-check too (assumed normalized as LHEScaleSumw: to be checked).
 
 
-Where:
+where:
 
-    lxplus, with ROOT (python3) and dasgoclient, e.g. any recent CMSSW release (cmsenv), or:
+    lxplus
+    /afs/cern.ch/user/a/amassiro/work/UEPS/PSWeights/
 
-    source /cvmfs/sft.cern.ch/lcg/views/LCG_109a/x86_64-el9-gcc13-opt/setup.sh
-    export PATH=/cvmfs/cms.cern.ch/common:$PATH
 
-A grid proxy is needed to query DAS and to read the files via xrootd:
+First, the grid proxy (needed to query DAS and to read the files via xrootd):
 
     voms-proxy-init -voms cms -rfc -valid 192:00
 
+
+Setup:
+
+    ROOT (python3) and dasgoclient, e.g. any recent CMSSW release (cmsenv), or:
+
+    source /cvmfs/sft.cern.ch/lcg/views/LCG_109a/x86_64-el9-gcc13-opt/setup.sh
+    export PATH=/cvmfs/cms.cern.ch/common:$PATH
 
 Run:
 
@@ -51,6 +57,24 @@ Where:
     -r, --redirector  xrootd redirector (default: root://cms-xrd-global.cern.ch/)
     -j, --threads     number of threads (default: 4, 0 = no multithreading)
     -o, --output      text file with the summary (dataset, index, R, error)
+    -p, --plotDir     folder for the plots (default: plots)
+    -b, --binning     binning of the PSWeight histograms: nbins min max (default: 200 0 4)
+    -l, --linear      linear y axis in the plots (default: log)
+    --batch           do not show the plots on screen, only save them
+
+Plots:
+
+    one TCanvas per dataset, with the distributions of PSWeight[i] for all the requested indices,
+    weighted with genWeight (the weighted mean of each histogram is R[i]), only events with nPSWeight > i.
+    The canvas stays on screen (press Enter to exit) and it is saved as:
+
+    plots/PSWeights_<sample>.png
+    plots/PSWeights_<sample>.root
+
+    where <sample> is the first part of the DAS name, e.g. PSWeights_WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8.png
+    (if the same sample appears in more campaigns, the campaign is added, e.g. PSWeights_WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8__Run3Summer22NanoAODv12.png)
+
+NB: on lxplus without X forwarding, or in a batch job, use --batch
 
 Examples:
 
