@@ -152,10 +152,21 @@ def checkDataset(dataset, redirector, maxFiles, indices, binning, plotDir, logy)
 # ---- plot of the PSWeight distributions ----
 
 keepAlive = []
+usedNames = []
+
+def plotName(dataset):
+  # first part of the DAS name, e.g. WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8
+  # if already used (same sample, different campaign), add the campaign, e.g. __Run3Summer22NanoAODv12
+  parts = dataset.strip("/").split("/")
+  name = parts[0]
+  if name in usedNames and len(parts) > 1:
+    name = name + "__" + parts[1].split("-")[0]
+  usedNames.append(name)
+  return name
 
 def drawPSWeights(dataset, histos, results, plotDir, logy):
   colors = [632, 600, 418, 807, 616, 432, 920, 880]   # kRed, kBlue, kGreen+2, kOrange+7, kMagenta, kCyan, kGray, kViolet
-  name = dataset.strip("/").replace("/", "__")
+  name = plotName(dataset)
 
   cc = ROOT.TCanvas ("cc_" + name, "", 800, 600)
   if logy:

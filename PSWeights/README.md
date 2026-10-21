@@ -68,8 +68,11 @@ Plots:
     weighted with genWeight (the weighted mean of each histogram is R[i]), only events with nPSWeight > i.
     The canvas stays on screen (press Enter to exit) and it is saved as:
 
-    plots/PSWeights_<dataset>.png
-    plots/PSWeights_<dataset>.root
+    plots/PSWeights_<sample>.png
+    plots/PSWeights_<sample>.root
+
+    where <sample> is the first part of the DAS name, e.g. PSWeights_WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8.png
+    (if the same sample appears in more campaigns, the campaign is added, e.g. PSWeights_WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8__Run3Summer22NanoAODv12.png)
 
 NB: on lxplus without X forwarding, or in a batch job, use --batch
 
