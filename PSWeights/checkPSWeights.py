@@ -13,6 +13,7 @@ import argparse
 import subprocess
 import math
 import os
+import re
 import ROOT
 
 
@@ -61,6 +62,31 @@ def getPSWeightInfo(fileName):
   return title, hasPSSumw
 
 
+# ---- meaning of each PSWeight index, from the branch description ----
+
+def describeVariation(name, value):
+  if value > 1:
+    return f"{name} up (#times{value:g})"
+  return f"{name} down (#times{value:g})"
+
+
+def getPSWeightMeanings(title):
+  # e.g. "PS weights (w_var / w_nominal);   [0] is ISR=2 FSR=1; [1] is ISR=1 FSR=2[2] is ISR=0.5 FSR=1; [3] is ISR=1 FSR=0.5;"
+  meanings = {}
+  for index, isr, fsr in re.findall(r"\[(\d+)\]\s*is\s*ISR\s*=\s*([\d.]+)\s*FSR\s*=\s*([\d.]+)", title):
+    isr = float(isr)
+    fsr = float(fsr)
+    labels = []
+    if isr != 1:
+      labels.append(describeVariation("ISR", isr))
+    if fsr != 1:
+      labels.append(describeVariation("FSR", fsr))
+    if len(labels) == 0:
+      labels.append("nominal")
+    meanings[int(index)] = ", ".join(labels)
+  return meanings
+
+
 # ---- the actual check ----
 
 def checkDataset(dataset, redirector, maxFiles, indices, binning, plotDir, logy):
@@ -78,6 +104,10 @@ def checkDataset(dataset, redirector, maxFiles, indices, binning, plotDir, logy)
     print ("   PSWeight not found in ", files[0])
     return None
   print ("   PSWeight: ", title)
+  meanings = getPSWeightMeanings(title)
+  for i in indices:
+    if i not in meanings:
+      print (f"   WARNING: meaning of PSWeight[{i}] not found in the branch description")
 
   df = ROOT.RDataFrame("Events", files)
 
@@ -139,12 +169,14 @@ def checkDataset(dataset, redirector, maxFiles, indices, binning, plotDir, logy)
     line = f"   R[{i}] = sum(genWeight*PSWeight[{i}]) / sum(genWeight) = {R:.5f} +/- {err:.5f}   ({(R-1)*100:+.3f} %)"
     if hasPSSumw:
       line += f"   [Runs PSSumw: {sums[f'runsp{i}'].GetValue() / sumRuns.GetValue():.5f}]"
+    if i in meanings:
+      line += "   " + meanings[i].replace("#times", "x")
     print (line)
     nmissing = sums[f"nmissing{i}"].GetValue()
     if nmissing > 0:
       print (f"      WARNING: {nmissing} events with nPSWeight <= {i}: PSWeight[{i}] = 1 used for them")
 
-  drawPSWeights(dataset, histos, results, plotDir, logy)
+  drawPSWeights(dataset, histos, results, meanings, plotDir, logy)
 
   return results
 
@@ -164,15 +196,16 @@ def plotName(dataset):
   usedNames.append(name)
   return name
 
-def drawPSWeights(dataset, histos, results, plotDir, logy):
-  colors = [632, 600, 418, 807, 616, 432, 920, 880]   # kRed, kBlue, kGreen+2, kOrange+7, kMagenta, kCyan, kGray, kViolet
+def drawPSWeights(dataset, histos, results, meanings, plotDir, logy):
+  colors = [ROOT.kGreen+3, ROOT.kRed+1, ROOT.kBlue+1, ROOT.kCyan-4, ROOT.kMagenta+1, ROOT.kOrange+7, ROOT.kGray+2, ROOT.kViolet+1]
   name = plotName(dataset)
 
   cc = ROOT.TCanvas ("cc_" + name, "", 800, 600)
   if logy:
     cc.SetLogy()
 
-  legend = ROOT.TLegend(0.50, 0.65, 0.89, 0.89)
+  legend = ROOT.TLegend(0.38, 0.65, 0.89, 0.89)
+  legend.SetTextSize(0.03)
   legend.SetBorderSize(0)
   legend.SetFillStyle(0)
 
@@ -181,7 +214,7 @@ def drawPSWeights(dataset, histos, results, plotDir, logy):
   for iColor, (i, histo) in enumerate(histos.items()):
     h = histo.GetPtr()
     h.SetLineColor(colors[iColor % len(colors)])
-    h.SetLineWidth(2)
+    h.SetLineWidth(3)
     h.SetTitle(dataset.split("/")[1])
     h.GetXaxis().SetTitle("PSWeight")
     h.GetYaxis().SetTitle("events (weighted with genWeight)")
@@ -189,7 +222,8 @@ def drawPSWeights(dataset, histos, results, plotDir, logy):
     h.Draw("hist" if first else "hist same")
     first = False
     R, err = results[i]
-    legend.AddEntry(h, f"PSWeight[{i}], R = {R:.4f} #pm {err:.4f}", "l")
+    meaning = (" " + meanings[i] + ",") if i in meanings else ","
+    legend.AddEntry(h, f"PSWeight[{i}]{meaning} R = {R:.4f} #pm {err:.4f}", "l")
   legend.Draw()
 
   os.makedirs(plotDir, exist_ok=True)

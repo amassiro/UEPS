@@ -66,6 +66,7 @@ Plots:
 
     one TCanvas per dataset, with the distributions of PSWeight[i] for all the requested indices,
     weighted with genWeight (the weighted mean of each histogram is R[i]), only events with nPSWeight > i.
+    The legend shows the meaning of each PSWeight[i] (e.g. ISR up (x2)), read from the PSWeight branch description of the file.
     The canvas stays on screen (press Enter to exit) and it is saved as:
 
     plots/PSWeights_<sample>.png
