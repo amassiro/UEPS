@@ -57,6 +57,21 @@ Where:
     -r, --redirector  xrootd redirector (default: root://cms-xrd-global.cern.ch/)
     -j, --threads     number of threads (default: 4, 0 = no multithreading)
     -o, --output      text file with the summary (dataset, index, R, error)
+    -p, --plotDir     folder for the plots (default: plots)
+    -b, --binning     binning of the PSWeight histograms: nbins min max (default: 200 0 4)
+    -l, --linear      linear y axis in the plots (default: log)
+    --batch           do not show the plots on screen, only save them
+
+Plots:
+
+    one TCanvas per dataset, with the distributions of PSWeight[i] for all the requested indices,
+    weighted with genWeight (the weighted mean of each histogram is R[i]), only events with nPSWeight > i.
+    The canvas stays on screen (press Enter to exit) and it is saved as:
+
+    plots/PSWeights_<dataset>.png
+    plots/PSWeights_<dataset>.root
+
+NB: on lxplus without X forwarding, or in a batch job, use --batch
 
 Examples:
 
