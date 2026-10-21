@@ -33,17 +33,17 @@ where:
     /afs/cern.ch/user/a/amassiro/work/UEPS/PSWeights/
 
 
+First, the grid proxy (needed to query DAS and to read the files via xrootd):
+
+    voms-proxy-init -voms cms -rfc -valid 192:00
+
+
 Setup:
 
     ROOT (python3) and dasgoclient, e.g. any recent CMSSW release (cmsenv), or:
 
     source /cvmfs/sft.cern.ch/lcg/views/LCG_109a/x86_64-el9-gcc13-opt/setup.sh
     export PATH=/cvmfs/cms.cern.ch/common:$PATH
-
-A grid proxy is needed to query DAS and to read the files via xrootd:
-
-    voms-proxy-init -voms cms -rfc -valid 192:00
-
 
 Run:
 
