@@ -108,19 +108,15 @@ Where:
     -s, --samples     latino sample names (wildcards allowed, quote them: "WW*")
     -n, --maxFiles    max number of files (parts) per sample (default: -1 = all)
     -r, --redirector  xrootd redirector, if the folder is not visible locally (default: root://eoscms.cern.ch/)
-    --nLeptons        number of leptons of the skim, for the plot names (default: from the folder name)
     other options as for checkPSWeights.py
 
 The files are found with glob if the folder is visible (e.g. /eos mounted), otherwise with xrdfs.
-The plots are named after the number of leptons of the skim and the latino sample name:
+The plots are named after the latino sample name:
 
-    plots/PSWeights_latino_<N>Leptons_<sample>.png
-    plots/PSWeights_latino_<N>Leptons_<sample>.root
+    plots/PSWeights_latino_NLeptons_<sample>.png
+    plots/PSWeights_latino_NLeptons_<sample>.root
 
-    e.g. plots/PSWeights_latino_2Leptons_WWTo2L2Nu.root
-
-N is taken from the post-processing steps in the folder name (e.g. ...__l2tightOR2018v9 --> 2, MCl1loose2018v9__MCCorr2018v9NoJERInHorn --> 1),
-or it can be set with --nLeptons.
+    e.g. plots/PSWeights_latino_NLeptons_WWTo2L2Nu.root
 
 NB: the latino trees are skimmed (e.g. l1loose, l2tight): R is the normalization change of the PSWeight variation inside the skim,
 not on the full sample. The ratio
