@@ -183,7 +183,6 @@ def checkDataset(dataset, redirector, maxFiles, indices, binning, plotDir, logy)
 
 # ---- plot of the PSWeight distributions ----
 
-keepAlive = []
 usedNames = []
 
 def plotName(dataset):
@@ -230,9 +229,6 @@ def drawPSWeights(dataset, histos, results, meanings, plotDir, logy):
   cc.SaveAs(plotDir + "/PSWeights_" + name + ".png")
   cc.SaveAs(plotDir + "/PSWeights_" + name + ".root")
 
-  # keep canvas, histograms and legend alive, to have them on screen
-  keepAlive.append([cc, legend, histos])
-
 
 #
 # main
@@ -248,10 +244,10 @@ parser.add_argument("-o", "--output",     default="", help="output text file wit
 parser.add_argument("-p", "--plotDir",    default="plots", help="folder for the plots of the PSWeight distributions")
 parser.add_argument("-b", "--binning",    nargs=3, type=float, default=[200, 0., 4.], help="binning of the PSWeight histograms: nbins min max")
 parser.add_argument("-l", "--linear",     action="store_true", help="linear y axis in the plots (default: log)")
-parser.add_argument("--batch",            action="store_true", help="do not show the plots on screen, only save them")
 args = parser.parse_args()
 
-ROOT.gROOT.SetBatch(args.batch)
+# no plots on screen, only saved as png and root
+ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 
 if args.threads > 0:
@@ -276,8 +272,3 @@ if args.output != "":
       fileOut.write(line + "\n")
   print ("")
   print ("Summary written in ", args.output)
-
-# keep the plots on screen
-if not args.batch and len(keepAlive) > 0:
-  print ("")
-  input ("Plots on screen: press Enter to exit ")

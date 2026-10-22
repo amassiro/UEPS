@@ -11,6 +11,7 @@
 #
 
 import argparse
+import sys
 import subprocess
 import fnmatch
 import glob
@@ -23,6 +24,16 @@ import ROOT
 # ---- post-processed (latino) trees ----
 
 listedDirectories = {}
+
+def getNLeptons(directory):
+  # number of leptons of the skim, from the post-processing steps in the folder name
+  # e.g. MCl1loose2018v9__MCCorr2018v9NoJERInHorn__l2tightOR2018v9 --> 2, MCl1loose2018v9__MCCorr2018v9NoJERInHorn --> 1
+  steps = os.path.basename(directory.rstrip("/"))
+  numbers = [int(n) for n in re.findall(r"l(\d+)(?:loose|tight)", steps)]
+  if len(numbers) == 0:
+    return None
+  return max(numbers)
+
 
 def listDirectory(directory, redirector):
   # list the files in the folder: glob if visible (e.g. /eos mounted), otherwise xrdfs
@@ -104,7 +115,7 @@ def getPSWeightMeanings(title):
 
 # ---- the actual check ----
 
-def checkSample(label, name, campaign, files, indices, binning, plotDir, logy):
+def checkSample(label, name, campaign, files, indices, binning, plotDir, logy, nLeptons):
   print ("")
   print ("---- ", label)
 
@@ -196,14 +207,13 @@ def checkSample(label, name, campaign, files, indices, binning, plotDir, logy):
     if nmissing > 0:
       print (f"      WARNING: {nmissing} events with nPSWeight <= {i}: PSWeight[{i}] = 1 used for them")
 
-  drawPSWeights(name, campaign, histos, results, meanings, plotDir, logy)
+  drawPSWeights(name, campaign, histos, results, meanings, plotDir, logy, nLeptons)
 
   return results
 
 
 # ---- plot of the PSWeight distributions ----
 
-keepAlive = []
 usedNames = []
 
 def plotName(name, campaign):
@@ -214,7 +224,7 @@ def plotName(name, campaign):
   usedNames.append(name)
   return name
 
-def drawPSWeights(sampleName, campaign, histos, results, meanings, plotDir, logy):
+def drawPSWeights(sampleName, campaign, histos, results, meanings, plotDir, logy, nLeptons):
   colors = [ROOT.kGreen+3, ROOT.kRed+1, ROOT.kBlue+1, ROOT.kCyan-4, ROOT.kMagenta+1, ROOT.kOrange+7, ROOT.kGray+2, ROOT.kViolet+1]
   name = plotName(sampleName, campaign)
 
@@ -245,11 +255,9 @@ def drawPSWeights(sampleName, campaign, histos, results, meanings, plotDir, logy
   legend.Draw()
 
   os.makedirs(plotDir, exist_ok=True)
-  cc.SaveAs(plotDir + "/PSWeights_" + name + ".png")
-  cc.SaveAs(plotDir + "/PSWeights_" + name + ".root")
-
-  # keep canvas, histograms and legend alive, to have them on screen
-  keepAlive.append([cc, legend, histos])
+  # e.g. PSWeights_latino_2Leptons_WWTo2L2Nu.root
+  cc.SaveAs(plotDir + f"/PSWeights_latino_{nLeptons}Leptons_" + name + ".png")
+  cc.SaveAs(plotDir + f"/PSWeights_latino_{nLeptons}Leptons_" + name + ".root")
 
 
 #
@@ -267,10 +275,11 @@ parser.add_argument("-o", "--output",     default="", help="output text file wit
 parser.add_argument("-p", "--plotDir",    default="plots", help="folder for the plots of the PSWeight distributions")
 parser.add_argument("-b", "--binning",    nargs=3, type=float, default=[200, 0., 4.], help="binning of the PSWeight histograms: nbins min max")
 parser.add_argument("-l", "--linear",     action="store_true", help="linear y axis in the plots (default: log)")
-parser.add_argument("--batch",            action="store_true", help="do not show the plots on screen, only save them")
+parser.add_argument("--nLeptons",         type=int, default=-1, help="number of leptons of the skim, for the plot names (default: from the folder name, e.g. l2tight --> 2)")
 args = parser.parse_args()
 
-ROOT.gROOT.SetBatch(args.batch)
+# no plots on screen, only saved as png and root
+ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 
 if args.threads > 0:
@@ -281,6 +290,12 @@ if args.threads > 0:
 #
 toCheck = []
 directory = args.directory.rstrip("/")
+
+nLeptons = args.nLeptons if args.nLeptons >= 0 else getNLeptons(directory)
+if nLeptons == None:
+  print ("ERROR: number of leptons of the skim not found in the folder name ", directory, ", use --nLeptons")
+  sys.exit(1)
+print ("Skim with ", nLeptons, " leptons")
 # campaign: production folder, e.g. Summer20UL18_106x_nAODv9_Full2018v9
 campaign = os.path.basename(os.path.dirname(directory))
 for sample in args.samples:
@@ -292,7 +307,7 @@ for sample in args.samples:
 
 summary = []
 for label, name, campaign, files in toCheck:
-  results = checkSample(label, name, campaign, files, args.indices, args.binning, args.plotDir, not args.linear)
+  results = checkSample(label, name, campaign, files, args.indices, args.binning, args.plotDir, not args.linear, nLeptons)
   if results == None:
     continue
   for i, (R, err) in results.items():
@@ -305,8 +320,3 @@ if args.output != "":
       fileOut.write(line + "\n")
   print ("")
   print ("Summary written in ", args.output)
-
-# keep the plots on screen
-if not args.batch and len(keepAlive) > 0:
-  print ("")
-  input ("Plots on screen: press Enter to exit ")
