@@ -60,14 +60,13 @@ Where:
     -p, --plotDir     folder for the plots (default: plots)
     -b, --binning     binning of the PSWeight histograms: nbins min max (default: 200 0 4)
     -l, --linear      linear y axis in the plots (default: log)
-    --batch           do not show the plots on screen, only save them
 
 Plots:
 
     one TCanvas per dataset, with the distributions of PSWeight[i] for all the requested indices,
     weighted with genWeight (the weighted mean of each histogram is R[i]), only events with nPSWeight > i.
     The legend shows the meaning of each PSWeight[i] (e.g. ISR up (x2)), read from the PSWeight branch description of the file.
-    The canvas stays on screen (press Enter to exit) and it is saved as:
+    The canvas is not shown on screen, it is only saved as:
 
     plots/PSWeights_<sample>.png
     plots/PSWeights_<sample>.root
@@ -75,7 +74,6 @@ Plots:
     where <sample> is the first part of the DAS name, e.g. PSWeights_WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8.png
     (if the same sample appears in more campaigns, the campaign is added, e.g. PSWeights_WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8__Run3Summer22NanoAODv12.png)
 
-NB: on lxplus without X forwarding, or in a batch job, use --batch
 
 Examples:
 
@@ -110,10 +108,19 @@ Where:
     -s, --samples     latino sample names (wildcards allowed, quote them: "WW*")
     -n, --maxFiles    max number of files (parts) per sample (default: -1 = all)
     -r, --redirector  xrootd redirector, if the folder is not visible locally (default: root://eoscms.cern.ch/)
+    --nLeptons        number of leptons of the skim, for the plot names (default: from the folder name)
     other options as for checkPSWeights.py
 
 The files are found with glob if the folder is visible (e.g. /eos mounted), otherwise with xrdfs.
-The plots are named after the latino sample name, e.g. plots/PSWeights_WWTo2L2Nu.png
+The plots are named after the number of leptons of the skim and the latino sample name:
+
+    plots/PSWeights_latino_<N>Leptons_<sample>.png
+    plots/PSWeights_latino_<N>Leptons_<sample>.root
+
+    e.g. plots/PSWeights_latino_2Leptons_WWTo2L2Nu.root
+
+N is taken from the post-processing steps in the folder name (e.g. ...__l2tightOR2018v9 --> 2, MCl1loose2018v9__MCCorr2018v9NoJERInHorn --> 1),
+or it can be set with --nLeptons.
 
 NB: the latino trees are skimmed (e.g. l1loose, l2tight): R is the normalization change of the PSWeight variation inside the skim,
 not on the full sample. The ratio
