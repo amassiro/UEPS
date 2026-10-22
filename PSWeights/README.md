@@ -90,3 +90,35 @@ NB: the dataset names above are just examples, check them in DAS:
     dasgoclient -query="dataset dataset=/WWto2L2Nu*/Run3Summer22NanoAODv12*/NANOAODSIM"
 
 NB: running on the full dataset reads all the events via xrootd: it may take a while. Use -n for a quick test.
+
+
+Post-processed (latino) trees
+====
+
+Same study, with checkPSWeightsLatino.py, on the post-processed (latino) trees, e.g. in /eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/...
+Same options and same plots, but the input is a folder and the latino sample names, as in nanoLatino_<sample>__part*.root (wildcards allowed).
+
+Run:
+
+    python3 checkPSWeightsLatino.py  -d /eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/Summer20UL18_106x_nAODv9_Full2018v9/MCl1loose2018v9__MCCorr2018v9NoJERInHorn__l2tightOR2018v9  -s WWTo2L2Nu  TTTo2L2Nu
+
+    python3 checkPSWeightsLatino.py  -d /eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/Summer20UL18_106x_nAODv9_Full2018v9/MCl1loose2018v9__MCCorr2018v9NoJERInHorn__l2tightOR2018v9  -s "WW*"  -n 5
+
+Where:
+
+    -d, --directory   folder with the latino trees
+    -s, --samples     latino sample names (wildcards allowed, quote them: "WW*")
+    -n, --maxFiles    max number of files (parts) per sample (default: -1 = all)
+    -r, --redirector  xrootd redirector, if the folder is not visible locally (default: root://eoscms.cern.ch/)
+    other options as for checkPSWeights.py
+
+The files are found with glob if the folder is visible (e.g. /eos mounted), otherwise with xrdfs.
+The plots are named after the latino sample name, e.g. plots/PSWeights_WWTo2L2Nu.png
+
+NB: the latino trees are skimmed (e.g. l1loose, l2tight): R is the normalization change of the PSWeight variation inside the skim,
+not on the full sample. The ratio
+
+    sum genWeight (Events) / sum genEventSumw (Runs)
+
+is printed too: it is the (weighted) skim efficiency (1 for the full nanoAOD).
+For the normalization on the full sample, use checkPSWeights.py on the DAS nanoAOD.
