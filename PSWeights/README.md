@@ -7,10 +7,22 @@ For each sample, on all the events, no selections:
 
     R[i] = sum( genWeight * PSWeight[i] ) / sum( genWeight )
 
+$$
+R_i = \frac{\sum_k \mathrm{genWeight}_k \cdot \mathrm{PSWeight}[i]_k}{\sum_k \mathrm{genWeight}_k}
+$$
+
+i.e. the yield with the PSWeight[i] variation over the nominal yield (only genWeight), on the same events.
+PSWeight is already w_var / w_nominal, so genWeight * PSWeight[i] is the event weight with the parton shower variation.
+No other weights are used (cross section, luminosity, scale factors): constant factors per sample cancel in the ratio.
+
 R = 1 means the PSWeight[i] variation is a pure shape variation.
 
 The uncertainty on R is the MC statistical one, from the sum of the squared weights
 (A and B of R = A/B are correlated, same events: delta method, var(R) = sum_k [ w_k (PSWeight_k - R) ]^2 / B^2).
+
+$$
+\sigma_{R_i}^2 = \frac{\sum_k w_k^2 \left( p_k - R_i \right)^2}{\left( \sum_k w_k \right)^2}, \qquad w_k = \mathrm{genWeight}_k, \quad p_k = \mathrm{PSWeight}[i]_k
+$$
 
 NB: PSWeight convention, from the nanoAOD documentation (recent versions):
 
