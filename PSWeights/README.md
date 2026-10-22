@@ -71,6 +71,10 @@ Plots:
     plots/PSWeights_<sample>.png
     plots/PSWeights_<sample>.root
 
+    together with the list of the files used (also printed on screen):
+
+    plots/PSWeights_<sample>_list_files.txt
+
     where <sample> is the first part of the DAS name, e.g. PSWeights_WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8.png
     (if the same sample appears in more campaigns, the campaign is added, e.g. PSWeights_WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8__Run3Summer22NanoAODv12.png)
 
@@ -115,6 +119,7 @@ The plots are named after the latino sample name:
 
     plots/PSWeights_latino_NLeptons_<sample>.png
     plots/PSWeights_latino_NLeptons_<sample>.root
+    plots/PSWeights_latino_NLeptons_<sample>_list_files.txt   (list of the files used, also printed on screen)
 
     e.g. plots/PSWeights_latino_NLeptons_WWTo2L2Nu.root
 

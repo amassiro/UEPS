@@ -98,6 +98,8 @@ def checkDataset(dataset, redirector, maxFiles, indices, binning, plotDir, logy)
     print ("   no files found")
     return None
   print ("   files: ", len(files))
+  for fileName in files:
+    print ("      ", fileName)
 
   title, hasPSSumw = getPSWeightInfo(files[0])
   if title == None:
@@ -176,12 +178,18 @@ def checkDataset(dataset, redirector, maxFiles, indices, binning, plotDir, logy)
     if nmissing > 0:
       print (f"      WARNING: {nmissing} events with nPSWeight <= {i}: PSWeight[{i}] = 1 used for them")
 
-  drawPSWeights(dataset, histos, results, meanings, plotDir, logy)
+  drawPSWeights(dataset, files, histos, results, meanings, plotDir, logy)
 
   return results
 
 
 # ---- plot of the PSWeight distributions ----
+
+def writeFileList(fileName, files):
+  with open(fileName, "w") as fileOut:
+    for f in files:
+      fileOut.write(f + "\n")
+  print ("   list of files written in ", fileName)
 
 usedNames = []
 
@@ -195,7 +203,7 @@ def plotName(dataset):
   usedNames.append(name)
   return name
 
-def drawPSWeights(dataset, histos, results, meanings, plotDir, logy):
+def drawPSWeights(dataset, files, histos, results, meanings, plotDir, logy):
   colors = [ROOT.kGreen+3, ROOT.kRed+1, ROOT.kBlue+1, ROOT.kCyan-4, ROOT.kMagenta+1, ROOT.kOrange+7, ROOT.kGray+2, ROOT.kViolet+1]
   name = plotName(dataset)
 
@@ -228,6 +236,9 @@ def drawPSWeights(dataset, histos, results, meanings, plotDir, logy):
   os.makedirs(plotDir, exist_ok=True)
   cc.SaveAs(plotDir + "/PSWeights_" + name + ".png")
   cc.SaveAs(plotDir + "/PSWeights_" + name + ".root")
+
+  # list of the files used
+  writeFileList(plotDir + "/PSWeights_" + name + "_list_files.txt", files)
 
 
 #

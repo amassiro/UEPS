@@ -113,6 +113,8 @@ def checkSample(label, name, campaign, files, indices, binning, plotDir, logy):
     print ("   no files found")
     return None
   print ("   files: ", len(files))
+  for fileName in files:
+    print ("      ", fileName)
 
   title, hasRuns, hasPSSumw = getPSWeightInfo(files[0])
   if title == None:
@@ -197,12 +199,18 @@ def checkSample(label, name, campaign, files, indices, binning, plotDir, logy):
     if nmissing > 0:
       print (f"      WARNING: {nmissing} events with nPSWeight <= {i}: PSWeight[{i}] = 1 used for them")
 
-  drawPSWeights(name, campaign, histos, results, meanings, plotDir, logy)
+  drawPSWeights(name, campaign, files, histos, results, meanings, plotDir, logy)
 
   return results
 
 
 # ---- plot of the PSWeight distributions ----
+
+def writeFileList(fileName, files):
+  with open(fileName, "w") as fileOut:
+    for f in files:
+      fileOut.write(f + "\n")
+  print ("   list of files written in ", fileName)
 
 usedNames = []
 
@@ -214,7 +222,7 @@ def plotName(name, campaign):
   usedNames.append(name)
   return name
 
-def drawPSWeights(sampleName, campaign, histos, results, meanings, plotDir, logy):
+def drawPSWeights(sampleName, campaign, files, histos, results, meanings, plotDir, logy):
   colors = [ROOT.kGreen+3, ROOT.kRed+1, ROOT.kBlue+1, ROOT.kCyan-4, ROOT.kMagenta+1, ROOT.kOrange+7, ROOT.kGray+2, ROOT.kViolet+1]
   name = plotName(sampleName, campaign)
 
@@ -248,6 +256,9 @@ def drawPSWeights(sampleName, campaign, histos, results, meanings, plotDir, logy
   # e.g. PSWeights_latino_NLeptons_WWTo2L2Nu.root
   cc.SaveAs(plotDir + "/PSWeights_latino_NLeptons_" + name + ".png")
   cc.SaveAs(plotDir + "/PSWeights_latino_NLeptons_" + name + ".root")
+
+  # list of the files used
+  writeFileList(plotDir + "/PSWeights_latino_NLeptons_" + name + "_list_files.txt", files)
 
 
 #
