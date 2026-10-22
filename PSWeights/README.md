@@ -7,10 +7,22 @@ For each sample, on all the events, no selections:
 
     R[i] = sum( genWeight * PSWeight[i] ) / sum( genWeight )
 
+$$
+R_i = \frac{\sum_k \mathrm{genWeight}_k \cdot \mathrm{PSWeight}[i]_k}{\sum_k \mathrm{genWeight}_k}
+$$
+
+i.e. the yield with the PSWeight[i] variation over the nominal yield (only genWeight), on the same events.
+PSWeight is already w_var / w_nominal, so genWeight * PSWeight[i] is the event weight with the parton shower variation.
+No other weights are used (cross section, luminosity, scale factors): constant factors per sample cancel in the ratio.
+
 R = 1 means the PSWeight[i] variation is a pure shape variation.
 
 The uncertainty on R is the MC statistical one, from the sum of the squared weights
 (A and B of R = A/B are correlated, same events: delta method, var(R) = sum_k [ w_k (PSWeight_k - R) ]^2 / B^2).
+
+$$
+\sigma_{R_i}^2 = \frac{\sum_k w_k^2 \left( p_k - R_i \right)^2}{\left( \sum_k w_k \right)^2}, \qquad w_k = \mathrm{genWeight}_k, \quad p_k = \mathrm{PSWeight}[i]_k
+$$
 
 NB: PSWeight convention, from the nanoAOD documentation (recent versions):
 
@@ -71,6 +83,10 @@ Plots:
     plots/PSWeights_<sample>.png
     plots/PSWeights_<sample>.root
 
+    together with the list of the files used (also printed on screen):
+
+    plots/PSWeights_<sample>_list_files.txt
+
     where <sample> is the first part of the DAS name, e.g. PSWeights_WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8.png
     (if the same sample appears in more campaigns, the campaign is added, e.g. PSWeights_WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8__Run3Summer22NanoAODv12.png)
 
@@ -106,21 +122,38 @@ Where:
 
     -d, --directory   folder with the latino trees
     -s, --samples     latino sample names (wildcards allowed, quote them: "WW*")
+    -a, --all         test all the samples in the folder (all the nanoLatino_<sample>__part*.root), instead of -s
+    --results         text file with one line per sample: name and the ratios R[i] (default: results.txt)
     -n, --maxFiles    max number of files (parts) per sample (default: -1 = all)
     -r, --redirector  xrootd redirector, if the folder is not visible locally (default: root://eoscms.cern.ch/)
-    --nLeptons        number of leptons of the skim, for the plot names (default: from the folder name)
     other options as for checkPSWeights.py
 
+All the samples in a folder:
+
+    python3 checkPSWeightsLatino.py  -d /eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/Summer20UL18_106x_nAODv9_Full2018v9/MCl1loose2018v9__MCCorr2018v9NoJERInHorn__l2tightOR2018v9  -a
+
+The list of the samples to test (with the number of files) is printed first, then for each sample:
+
+    running on sample WWTo2L2Nu, 16.7 % of files analyzed
+
+where the percentage is the number of files of the samples already analyzed over the total number of files to analyze
+(all the nanoLatino files in the folder with -a; fewer with -n). The progress is updated sample by sample.
+
+At the end (and updated after each sample), results.txt (option --results) has one line per sample, with the name and the ratios R[i]:
+
+    # name  R[0]  R[1]  R[2]  R[3]
+    WWTo2L2Nu  1.021300  0.998700  0.979000  1.000500
+
+(nan if the sample could not be analyzed, e.g. no PSWeight branch)
+
 The files are found with glob if the folder is visible (e.g. /eos mounted), otherwise with xrdfs.
-The plots are named after the number of leptons of the skim and the latino sample name:
+The plots are named after the latino sample name:
 
-    plots/PSWeights_latino_<N>Leptons_<sample>.png
-    plots/PSWeights_latino_<N>Leptons_<sample>.root
+    plots/PSWeights_latino_NLeptons_<sample>.png
+    plots/PSWeights_latino_NLeptons_<sample>.root
+    plots/PSWeights_latino_NLeptons_<sample>_list_files.txt   (list of the files used, also printed on screen)
 
-    e.g. plots/PSWeights_latino_2Leptons_WWTo2L2Nu.root
-
-N is taken from the post-processing steps in the folder name (e.g. ...__l2tightOR2018v9 --> 2, MCl1loose2018v9__MCCorr2018v9NoJERInHorn --> 1),
-or it can be set with --nLeptons.
+    e.g. plots/PSWeights_latino_NLeptons_WWTo2L2Nu.root
 
 NB: the latino trees are skimmed (e.g. l1loose, l2tight): R is the normalization change of the PSWeight variation inside the skim,
 not on the full sample. The ratio

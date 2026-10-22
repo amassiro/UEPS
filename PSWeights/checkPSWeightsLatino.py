@@ -11,7 +11,6 @@
 #
 
 import argparse
-import sys
 import subprocess
 import fnmatch
 import glob
@@ -24,15 +23,6 @@ import ROOT
 # ---- post-processed (latino) trees ----
 
 listedDirectories = {}
-
-def getNLeptons(directory):
-  # number of leptons of the skim, from the post-processing steps in the folder name
-  # e.g. MCl1loose2018v9__MCCorr2018v9NoJERInHorn__l2tightOR2018v9 --> 2, MCl1loose2018v9__MCCorr2018v9NoJERInHorn --> 1
-  steps = os.path.basename(directory.rstrip("/"))
-  numbers = [int(n) for n in re.findall(r"l(\d+)(?:loose|tight)", steps)]
-  if len(numbers) == 0:
-    return None
-  return max(numbers)
 
 
 def listDirectory(directory, redirector):
@@ -115,7 +105,7 @@ def getPSWeightMeanings(title):
 
 # ---- the actual check ----
 
-def checkSample(label, name, campaign, files, indices, binning, plotDir, logy, nLeptons):
+def checkSample(label, name, campaign, files, indices, binning, plotDir, logy):
   print ("")
   print ("---- ", label)
 
@@ -123,6 +113,8 @@ def checkSample(label, name, campaign, files, indices, binning, plotDir, logy, n
     print ("   no files found")
     return None
   print ("   files: ", len(files))
+  for fileName in files:
+    print ("      ", fileName)
 
   title, hasRuns, hasPSSumw = getPSWeightInfo(files[0])
   if title == None:
@@ -207,12 +199,18 @@ def checkSample(label, name, campaign, files, indices, binning, plotDir, logy, n
     if nmissing > 0:
       print (f"      WARNING: {nmissing} events with nPSWeight <= {i}: PSWeight[{i}] = 1 used for them")
 
-  drawPSWeights(name, campaign, histos, results, meanings, plotDir, logy, nLeptons)
+  drawPSWeights(name, campaign, files, histos, results, meanings, plotDir, logy)
 
   return results
 
 
 # ---- plot of the PSWeight distributions ----
+
+def writeFileList(fileName, files):
+  with open(fileName, "w") as fileOut:
+    for f in files:
+      fileOut.write(f + "\n")
+  print ("   list of files written in ", fileName)
 
 usedNames = []
 
@@ -224,7 +222,7 @@ def plotName(name, campaign):
   usedNames.append(name)
   return name
 
-def drawPSWeights(sampleName, campaign, histos, results, meanings, plotDir, logy, nLeptons):
+def drawPSWeights(sampleName, campaign, files, histos, results, meanings, plotDir, logy):
   colors = [ROOT.kGreen+3, ROOT.kRed+1, ROOT.kBlue+1, ROOT.kCyan-4, ROOT.kMagenta+1, ROOT.kOrange+7, ROOT.kGray+2, ROOT.kViolet+1]
   name = plotName(sampleName, campaign)
 
@@ -255,9 +253,12 @@ def drawPSWeights(sampleName, campaign, histos, results, meanings, plotDir, logy
   legend.Draw()
 
   os.makedirs(plotDir, exist_ok=True)
-  # e.g. PSWeights_latino_2Leptons_WWTo2L2Nu.root
-  cc.SaveAs(plotDir + f"/PSWeights_latino_{nLeptons}Leptons_" + name + ".png")
-  cc.SaveAs(plotDir + f"/PSWeights_latino_{nLeptons}Leptons_" + name + ".root")
+  # e.g. PSWeights_latino_NLeptons_WWTo2L2Nu.root
+  cc.SaveAs(plotDir + "/PSWeights_latino_NLeptons_" + name + ".png")
+  cc.SaveAs(plotDir + "/PSWeights_latino_NLeptons_" + name + ".root")
+
+  # list of the files used
+  writeFileList(plotDir + "/PSWeights_latino_NLeptons_" + name + "_list_files.txt", files)
 
 
 #
@@ -266,17 +267,23 @@ def drawPSWeights(sampleName, campaign, histos, results, meanings, plotDir, logy
 
 parser = argparse.ArgumentParser(description="Check the normalization of PSWeight (ISR/FSR) on post-processed (latino) trees")
 parser.add_argument("-d", "--directory",  required=True, help="folder with post-processed (latino) trees, e.g. /eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/Summer20UL18_106x_nAODv9_Full2018v9/MCl1loose2018v9__MCCorr2018v9NoJERInHorn__l2tightOR2018v9")
-parser.add_argument("-s", "--samples",    nargs="+", required=True, help="latino sample names, as in nanoLatino_<sample>__part*.root (wildcards allowed), e.g. WWTo2L2Nu")
+parser.add_argument("-s", "--samples",    nargs="+", default=[], help="latino sample names, as in nanoLatino_<sample>__part*.root (wildcards allowed), e.g. WWTo2L2Nu")
+parser.add_argument("-a", "--all",        action="store_true", help="test all the samples in the folder (all the nanoLatino_<sample>__part*.root)")
 parser.add_argument("-i", "--indices",    nargs="+", type=int, default=[0, 1, 2, 3], help="PSWeight indices to check")
 parser.add_argument("-n", "--maxFiles",   type=int, default=-1, help="max number of files (parts) per sample (-1 = all)")
 parser.add_argument("-r", "--redirector", default="root://eoscms.cern.ch/", help="xrootd redirector, if the folder is not visible locally")
 parser.add_argument("-j", "--threads",    type=int, default=4, help="number of threads (0 = no multithreading)")
 parser.add_argument("-o", "--output",     default="", help="output text file with the summary")
+parser.add_argument("--results",          default="results.txt", help="output text file with one line per sample: name and the ratios R[i]")
 parser.add_argument("-p", "--plotDir",    default="plots", help="folder for the plots of the PSWeight distributions")
 parser.add_argument("-b", "--binning",    nargs=3, type=float, default=[200, 0., 4.], help="binning of the PSWeight histograms: nbins min max")
 parser.add_argument("-l", "--linear",     action="store_true", help="linear y axis in the plots (default: log)")
-parser.add_argument("--nLeptons",         type=int, default=-1, help="number of leptons of the skim, for the plot names (default: from the folder name, e.g. l2tight --> 2)")
 args = parser.parse_args()
+
+if not args.all and len(args.samples) == 0:
+  parser.error("give the samples with -s, or use -a to test all the samples in the folder")
+if args.all and len(args.samples) > 0:
+  print ("WARNING: -a given, -s ignored: all the samples in the folder are tested")
 
 # no plots on screen, only saved as png and root
 ROOT.gROOT.SetBatch(True)
@@ -290,28 +297,61 @@ if args.threads > 0:
 #
 toCheck = []
 directory = args.directory.rstrip("/")
-
-nLeptons = args.nLeptons if args.nLeptons >= 0 else getNLeptons(directory)
-if nLeptons == None:
-  print ("ERROR: number of leptons of the skim not found in the folder name ", directory, ", use --nLeptons")
-  sys.exit(1)
-print ("Skim with ", nLeptons, " leptons")
 # campaign: production folder, e.g. Summer20UL18_106x_nAODv9_Full2018v9
 campaign = os.path.basename(os.path.dirname(directory))
-for sample in args.samples:
+patterns = ["*"] if args.all else args.samples
+for sample in patterns:
   samples = getLatinoSamples(directory, sample, args.redirector, args.maxFiles)
   if len(samples) == 0:
     print ("No latino sample found for ", sample, " in ", directory)
   for name, files in sorted(samples.items()):
+    # the same sample only once, also if matched by more than one -s
+    if name in [n for l, n, c, fs in toCheck]:
+      continue
     toCheck.append((directory + "/nanoLatino_" + name, name, campaign, files))
 
-summary = []
+# list of the samples to test
+totalFiles = sum([len(files) for label, name, campaign, files in toCheck])
+print ("")
+print ("Samples to test in ", directory, ": ", len(toCheck), ", files: ", totalFiles)
 for label, name, campaign, files in toCheck:
-  results = checkSample(label, name, campaign, files, args.indices, args.binning, args.plotDir, not args.linear, nLeptons)
+  print ("   ", name, " (", len(files), " files)")
+
+summary = []
+analyzedFiles = 0
+
+#
+# results.txt: one line per sample, name and R[i] for all the requested indices
+# written again after each sample, not to lose the results if the job stops
+#
+resultLines = []
+
+def writeResults():
+  with open(args.results, "w") as fileOut:
+    fileOut.write("# name  " + "  ".join([f"R[{i}]" for i in args.indices]) + "\n")
+    for line in resultLines:
+      fileOut.write(line + "\n")
+
+for label, name, campaign, files in toCheck:
+  # progress, per sample: files of the samples already analyzed over all the files to analyze
+  print ("")
+  print (f"running on sample {name}, {100. * analyzedFiles / totalFiles:.1f} % of files analyzed")
+  results = checkSample(label, name, campaign, files, args.indices, args.binning, args.plotDir, not args.linear)
+  analyzedFiles += len(files)
   if results == None:
+    # sample not analyzed (e.g. no PSWeight): nan
+    resultLines.append(name + "  " + "  ".join(["nan" for i in args.indices]))
+    writeResults()
     continue
+  resultLines.append(name + "  " + "  ".join([f"{results[i][0]:.6f}" for i in args.indices]))
+  writeResults()
   for i, (R, err) in results.items():
     summary.append(f"{label}  {i}  {R:.6f}  {err:.6f}")
+
+if len(toCheck) > 0:
+  print ("")
+  print (f"done, {100. * analyzedFiles / totalFiles:.1f} % of files analyzed")
+  print ("Results written in ", args.results)
 
 if args.output != "":
   with open(args.output, "w") as fileOut:
