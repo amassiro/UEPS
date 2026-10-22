@@ -267,7 +267,8 @@ def drawPSWeights(sampleName, campaign, files, histos, results, meanings, plotDi
 
 parser = argparse.ArgumentParser(description="Check the normalization of PSWeight (ISR/FSR) on post-processed (latino) trees")
 parser.add_argument("-d", "--directory",  required=True, help="folder with post-processed (latino) trees, e.g. /eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/Summer20UL18_106x_nAODv9_Full2018v9/MCl1loose2018v9__MCCorr2018v9NoJERInHorn__l2tightOR2018v9")
-parser.add_argument("-s", "--samples",    nargs="+", required=True, help="latino sample names, as in nanoLatino_<sample>__part*.root (wildcards allowed), e.g. WWTo2L2Nu")
+parser.add_argument("-s", "--samples",    nargs="+", default=[], help="latino sample names, as in nanoLatino_<sample>__part*.root (wildcards allowed), e.g. WWTo2L2Nu")
+parser.add_argument("-a", "--all",        action="store_true", help="test all the samples in the folder (all the nanoLatino_<sample>__part*.root)")
 parser.add_argument("-i", "--indices",    nargs="+", type=int, default=[0, 1, 2, 3], help="PSWeight indices to check")
 parser.add_argument("-n", "--maxFiles",   type=int, default=-1, help="max number of files (parts) per sample (-1 = all)")
 parser.add_argument("-r", "--redirector", default="root://eoscms.cern.ch/", help="xrootd redirector, if the folder is not visible locally")
@@ -277,6 +278,11 @@ parser.add_argument("-p", "--plotDir",    default="plots", help="folder for the 
 parser.add_argument("-b", "--binning",    nargs=3, type=float, default=[200, 0., 4.], help="binning of the PSWeight histograms: nbins min max")
 parser.add_argument("-l", "--linear",     action="store_true", help="linear y axis in the plots (default: log)")
 args = parser.parse_args()
+
+if not args.all and len(args.samples) == 0:
+  parser.error("give the samples with -s, or use -a to test all the samples in the folder")
+if args.all and len(args.samples) > 0:
+  print ("WARNING: -a given, -s ignored: all the samples in the folder are tested")
 
 # no plots on screen, only saved as png and root
 ROOT.gROOT.SetBatch(True)
@@ -292,20 +298,40 @@ toCheck = []
 directory = args.directory.rstrip("/")
 # campaign: production folder, e.g. Summer20UL18_106x_nAODv9_Full2018v9
 campaign = os.path.basename(os.path.dirname(directory))
-for sample in args.samples:
+patterns = ["*"] if args.all else args.samples
+for sample in patterns:
   samples = getLatinoSamples(directory, sample, args.redirector, args.maxFiles)
   if len(samples) == 0:
     print ("No latino sample found for ", sample, " in ", directory)
   for name, files in sorted(samples.items()):
+    # the same sample only once, also if matched by more than one -s
+    if name in [n for l, n, c, fs in toCheck]:
+      continue
     toCheck.append((directory + "/nanoLatino_" + name, name, campaign, files))
 
-summary = []
+# list of the samples to test
+totalFiles = sum([len(files) for label, name, campaign, files in toCheck])
+print ("")
+print ("Samples to test in ", directory, ": ", len(toCheck), ", files: ", totalFiles)
 for label, name, campaign, files in toCheck:
+  print ("   ", name, " (", len(files), " files)")
+
+summary = []
+analyzedFiles = 0
+for label, name, campaign, files in toCheck:
+  # progress, per sample: files of the samples already analyzed over all the files to analyze
+  print ("")
+  print (f"running on sample {name}, {100. * analyzedFiles / totalFiles:.1f} % of files analyzed")
   results = checkSample(label, name, campaign, files, args.indices, args.binning, args.plotDir, not args.linear)
+  analyzedFiles += len(files)
   if results == None:
     continue
   for i, (R, err) in results.items():
     summary.append(f"{label}  {i}  {R:.6f}  {err:.6f}")
+
+if len(toCheck) > 0:
+  print ("")
+  print (f"done, {100. * analyzedFiles / totalFiles:.1f} % of files analyzed")
 
 if args.output != "":
   with open(args.output, "w") as fileOut:

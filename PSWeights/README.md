@@ -122,9 +122,21 @@ Where:
 
     -d, --directory   folder with the latino trees
     -s, --samples     latino sample names (wildcards allowed, quote them: "WW*")
+    -a, --all         test all the samples in the folder (all the nanoLatino_<sample>__part*.root), instead of -s
     -n, --maxFiles    max number of files (parts) per sample (default: -1 = all)
     -r, --redirector  xrootd redirector, if the folder is not visible locally (default: root://eoscms.cern.ch/)
     other options as for checkPSWeights.py
+
+All the samples in a folder:
+
+    python3 checkPSWeightsLatino.py  -d /eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/Summer20UL18_106x_nAODv9_Full2018v9/MCl1loose2018v9__MCCorr2018v9NoJERInHorn__l2tightOR2018v9  -a
+
+The list of the samples to test (with the number of files) is printed first, then for each sample:
+
+    running on sample WWTo2L2Nu, 16.7 % of files analyzed
+
+where the percentage is the number of files of the samples already analyzed over the total number of files to analyze
+(all the nanoLatino files in the folder with -a; fewer with -n). The progress is updated sample by sample.
 
 The files are found with glob if the folder is visible (e.g. /eos mounted), otherwise with xrdfs.
 The plots are named after the latino sample name:
