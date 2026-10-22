@@ -274,6 +274,7 @@ parser.add_argument("-n", "--maxFiles",   type=int, default=-1, help="max number
 parser.add_argument("-r", "--redirector", default="root://eoscms.cern.ch/", help="xrootd redirector, if the folder is not visible locally")
 parser.add_argument("-j", "--threads",    type=int, default=4, help="number of threads (0 = no multithreading)")
 parser.add_argument("-o", "--output",     default="", help="output text file with the summary")
+parser.add_argument("--results",          default="results.txt", help="output text file with one line per sample: name and the ratios R[i]")
 parser.add_argument("-p", "--plotDir",    default="plots", help="folder for the plots of the PSWeight distributions")
 parser.add_argument("-b", "--binning",    nargs=3, type=float, default=[200, 0., 4.], help="binning of the PSWeight histograms: nbins min max")
 parser.add_argument("-l", "--linear",     action="store_true", help="linear y axis in the plots (default: log)")
@@ -318,6 +319,19 @@ for label, name, campaign, files in toCheck:
 
 summary = []
 analyzedFiles = 0
+
+#
+# results.txt: one line per sample, name and R[i] for all the requested indices
+# written again after each sample, not to lose the results if the job stops
+#
+resultLines = []
+
+def writeResults():
+  with open(args.results, "w") as fileOut:
+    fileOut.write("# name  " + "  ".join([f"R[{i}]" for i in args.indices]) + "\n")
+    for line in resultLines:
+      fileOut.write(line + "\n")
+
 for label, name, campaign, files in toCheck:
   # progress, per sample: files of the samples already analyzed over all the files to analyze
   print ("")
@@ -325,13 +339,19 @@ for label, name, campaign, files in toCheck:
   results = checkSample(label, name, campaign, files, args.indices, args.binning, args.plotDir, not args.linear)
   analyzedFiles += len(files)
   if results == None:
+    # sample not analyzed (e.g. no PSWeight): nan
+    resultLines.append(name + "  " + "  ".join(["nan" for i in args.indices]))
+    writeResults()
     continue
+  resultLines.append(name + "  " + "  ".join([f"{results[i][0]:.6f}" for i in args.indices]))
+  writeResults()
   for i, (R, err) in results.items():
     summary.append(f"{label}  {i}  {R:.6f}  {err:.6f}")
 
 if len(toCheck) > 0:
   print ("")
   print (f"done, {100. * analyzedFiles / totalFiles:.1f} % of files analyzed")
+  print ("Results written in ", args.results)
 
 if args.output != "":
   with open(args.output, "w") as fileOut:

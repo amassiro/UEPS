@@ -123,6 +123,7 @@ Where:
     -d, --directory   folder with the latino trees
     -s, --samples     latino sample names (wildcards allowed, quote them: "WW*")
     -a, --all         test all the samples in the folder (all the nanoLatino_<sample>__part*.root), instead of -s
+    --results         text file with one line per sample: name and the ratios R[i] (default: results.txt)
     -n, --maxFiles    max number of files (parts) per sample (default: -1 = all)
     -r, --redirector  xrootd redirector, if the folder is not visible locally (default: root://eoscms.cern.ch/)
     other options as for checkPSWeights.py
@@ -137,6 +138,13 @@ The list of the samples to test (with the number of files) is printed first, the
 
 where the percentage is the number of files of the samples already analyzed over the total number of files to analyze
 (all the nanoLatino files in the folder with -a; fewer with -n). The progress is updated sample by sample.
+
+At the end (and updated after each sample), results.txt (option --results) has one line per sample, with the name and the ratios R[i]:
+
+    # name  R[0]  R[1]  R[2]  R[3]
+    WWTo2L2Nu  1.021300  0.998700  0.979000  1.000500
+
+(nan if the sample could not be analyzed, e.g. no PSWeight branch)
 
 The files are found with glob if the folder is visible (e.g. /eos mounted), otherwise with xrdfs.
 The plots are named after the latino sample name:
