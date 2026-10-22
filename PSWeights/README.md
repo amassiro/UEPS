@@ -162,3 +162,56 @@ not on the full sample. The ratio
 
 is printed too: it is the (weighted) skim efficiency (1 for the full nanoAOD).
 For the normalization on the full sample, use checkPSWeights.py on the DAS nanoAOD.
+
+
+Expected yields
+====
+
+calculateYield.py: expected yield of each sample in a folder of post-processed (latino) trees, each sample independently.
+
+$$
+N = L \cdot \sum_k \mathrm{XSWeight}_k , \qquad \sigma_N = L \cdot \sqrt{\sum_k \mathrm{XSWeight}_k^2}
+$$
+
+    N = lumi * sum( XSWeight ),   uncertainty (MC statistics) = lumi * sqrt( sum( XSWeight^2 ) )
+
+XSWeight = baseW * genWeight, with baseW = xsec [pb] * 1000 / sum( genWeight ) of the full generated sample:
+sum( XSWeight ) is the number of expected events for 1/fb, i.e. the cross section in fb, inside the skim.
+
+NB: sum( genWeight ) alone is NOT a yield, genWeight has an arbitrary normalization.
+
+NB: samples post-processed with xsec = 1 (e.g. private samples) need the cross section by hand.
+
+Run:
+
+    # all the samples in the folder
+    python3 calculateYield.py  -d /eos/cms/store/group/phys_higgs/cmshww/amassiro/HWWNano/Summer20UL18_106x_nAODv9_Full2018v9/MCl1loose2018v9__MCCorr2018v9NoJERInHorn__l2tightOR2018v9
+
+    # only the underlying event variations
+    python3 calculateYield.py  -d <folder>  -s "*CP5Up*" "*CP5Down*"
+
+    # all but some samples
+    python3 calculateYield.py  -d <folder>  -x "*_PSWeights*" "DYJets*"
+
+Where:
+
+    -d, --directory   folder with the latino trees
+    -s, --samples     samples to analyze, wildcards allowed, quote them (default: all)
+    -x, --exclude     samples NOT to analyze, wildcards allowed, quote them
+    -w, --weight      weight of each event (default: XSWeight)
+    -L, --lumi        luminosity in 1/fb (default: 1, i.e. the yield is the cross section in fb)
+    -n, --maxFiles    max number of files (parts) per sample (default: -1 = all). NB: the yield is then only of these files
+    -r, --redirector  xrootd redirector, if the folder is not visible locally (default: root://eoscms.cern.ch/)
+    -j, --threads     number of threads (default: 4)
+    -o, --output      results file (default: results_yield.txt)
+
+The sample names are matched exactly (nanoLatino_<sample>__part*.root): -s WWTo2L2Nu does not include WWTo2L2Nu_CP5Up.
+
+Output, results_yield.txt, written again after each sample (not only at the end):
+
+    # folder: ...
+    # weight: XSWeight, lumi = 1.0 /fb
+    # name  nFiles  nEvents  yield  uncertainty
+    TTTo2L2Nu_CP5Down  10  123456  1234.5  6.7
+
+(nan if the sample could not be analyzed, e.g. missing branch)
